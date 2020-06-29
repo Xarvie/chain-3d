@@ -1,0 +1,30 @@
+syntax = "proto2";
+
+message ProtoGateRole       // 网关角色信息
+{
+    optional int64 role_id = 1;       // 角色ID
+    optional string name = 2;       // 角色名
+    optional int32 level = 3;       // 等级
+    optional int32 sex = 4;       // 性别;1 男，2 女
+    optional int32 career = 5;       // 职业；1 战士 2 法师 3 刺客 4 道士
+}
+
+message ProtoShowRole       // 角色外观信息
+{
+    optional int64 id = 1;       // 角色ID
+    optional string name = 2;       // 角色名
+    optional int32 sex = 3;       // 性别
+    optional int32 career = 4;       // 职业
+    optional int32 level = 5;       // 等级
+}
+
+message ProtoItem       // 道具信息
+{
+    optional int32 index = 1;       // 背包索引
+    optional int64 unique_id = 2;       // 唯一id
+    optional int32 id = 3;       // 道具id
+    optional int32 amount = 4;       // 数量
+    optional int32 bind = 5;       // 绑定：0 不绑定，1绑定
+}
+
+

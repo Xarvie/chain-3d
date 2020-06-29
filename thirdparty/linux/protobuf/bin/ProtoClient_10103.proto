@@ -1,0 +1,20 @@
+syntax = "proto2";
+import "ProtoPublic.proto";
+
+message Proto10103001       // 获取背包信息
+{
+    optional int32 type = 1;       // 类型
+}
+
+message Proto80103002       // 更新背包物品信息
+{
+    optional int32 type = 1;       // 类型
+    repeated ProtoItem item_list = 2;       // 所有道具信息
+}
+
+message Proto10103003       // 整理背包
+{
+    optional int32 type = 1;       // 类型
+}
+
+

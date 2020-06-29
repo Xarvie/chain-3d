@@ -1,0 +1,15 @@
+syntax = "proto2";
+
+import "ProtoPublic.proto";
+
+message Proto80101001       // 玩家登录信息通知
+{
+    optional int64 id = 1;       // 角色ID
+    optional ProtoShowRole show = 2;       // 外观信息
+    optional double exp = 3;       // 经验
+    optional int32 open_days = 4;       // 开服天数
+    optional int32 create_days = 5;       // 创号天数
+    optional string server_prev = 6;       // 服务器前缀
+}
+
+

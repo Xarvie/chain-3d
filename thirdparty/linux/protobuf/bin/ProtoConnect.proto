@@ -1,0 +1,15 @@
+syntax = "proto2";
+
+message Proto19999997	// 机器人断开链接请求
+{
+	optional int32 sid = 1;		// SOCKET ID
+	optional int32 robot_id = 2;	// 机器人ID
+}
+
+message Proto19999998	// 机器人链接请求
+{
+	optional int32 sid = 1;
+	optional string ip = 2;
+	optional int32 port = 3;
+	optional int32 robot_id = 4;
+}

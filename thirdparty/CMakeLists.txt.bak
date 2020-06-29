@@ -1,0 +1,69 @@
+if (POLICY CMP0048)
+    cmake_policy(SET CMP0048 NEW)
+endif()
+
+PROJECT(opengllib)
+cmake_minimum_required (VERSION 3.2)
+list(APPEND CMAKE_MODULE_PATH
+  "${CMAKE_SOURCE_DIR}/cmake/macros")
+include(AutoCollect)
+
+set(CMAKE_CXX_STANDARD 17)
+set(USE_GCC ON)
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
+
+add_definitions(-D_AFXDLL)
+set(CMAKE_MFC_FLAG 1)
+
+option(USE_MSVC_RUNTIME_LIBRARY_DLL OFF)
+
+option(BUILD_SHARED_LIBS OFF)
+option(GLFW_BUILD_DOCS OFF)
+option(GLFW_BUILD_EXAMPLES OFF)
+option(GLFW_BUILD_TESTS OFF)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/general/glfw-3.3)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/general/glfw-3.3/include/
+%VULKAN_SDK%/include)
+
+include_directories(${Vulkan_INCLUDE_DIRS})
+set(LIBS ${LIBS} glfw)
+
+option(ASSIMP_STATIC_LIB ON)
+option(ASSIMP_BUILD_ASSIMP_TOOLS OFF)
+option(ASSIMP_BUILD_SAMPLES OFF)
+option(ASSIMP_BUILD_TESTS OFF)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/general/assimp-5.0.0)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/general/assimp-5.0.0/include)
+set(LIBS ${LIBS} assimp)
+
+option(GLEW_STATIC ON)
+add_definitions(-DGLEW_STATIC)
+option(GLEW_USE_STATIC_LIBS ON)
+add_definitions(-DGLEW_USE_STATIC_LIBS)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/general/glew-2.1.0/build/cmake)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/general/glew-2.1.0/include)
+set(LIBS ${LIBS} glew_s)
+
+
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/general/glm2)
+
+# cd build
+# cmake .. -G "MinGW Makefiles" -DCMAKE_SH="CMAKE_SH-NOTFOUND" -DCMAKE_CXX_FLAGS="-static"
+
+MakeFilter(
+    ${CMAKE_CURRENT_SOURCE_DIR}/)
+
+
+add_library(STB_IMAGE "${CMAKE_CURRENT_SOURCE_DIR}/general/stb/stb_image.cpp")
+target_include_directories(STB_IMAGE
+        PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/general/stb/include/)
+set(LIBS ${LIBS} STB_IMAGE)
+
+
+add_library(GLAD "${CMAKE_CURRENT_SOURCE_DIR}/general/glad/glad.c")
+target_include_directories(GLAD
+        PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/general/glad/include/)
+set(LIBS ${LIBS} GLAD)
+
+
