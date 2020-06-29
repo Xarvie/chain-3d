@@ -12,33 +12,19 @@
 
 #include "Graphics/Camera.h"
 
+#include "Device.h"
+
 class Data {
 
 };
-
+class Device;
 class WorldData {
 public:
     WorldData() {
         init();
     }
 
-    void init() {
-
-        camera = glm::vec3(0.0f, 0.0f, 5.0f);
-        glm::vec3 light1Offset = glm::vec3(1, 1, 1);
-
-        light1Pos = glm::vec3(0, 16, 0);
-        lookCenterPos = glm::vec3(0, 0.0f, 5.0f);
-        lookUpPos = glm::vec3(0, 1, 0);
-
-        orthoLeft = -32;
-        orthoRight = 32;
-        orthoBottom = -32;
-        orthoTop = 32;
-        near_plane = 0.1;
-        far_plane = 32;
-        ro = -1.5f;
-    }
+    void init();
 
     void updateTime(float curTime) {
         currentFrame = curTime;
@@ -70,20 +56,21 @@ public:
     int ssao = 0;
 
 
-    int SCR_WIDTH = 1024;
-    int SCR_HEIGHT = 768;
-
-    float lastX = (float) SCR_WIDTH / 2.0;
-    float lastY = (float) SCR_HEIGHT / 2.0;
+    float lastX = 0;
+    float lastY = 0;
     bool firstMouse = true;
 
     float deltaTime = 0.0f;
     float lastFrame = 0.0f;
 
 
-    float currentFrame = 0.0f;
+    float currentFrame = 0.0;
+
+    Device * d = nullptr;
+    int w = 0;
+    int h = 0;
 };
 
-extern WorldData worldData;
+extern WorldData* worldData;
 
 #endif //INC_3D_DATA_H

@@ -74,10 +74,12 @@ int Device::createWindow(std::string title, int x, int y, int fullScreen, int lo
     glfwGetFramebufferSize(window, (int *) &xBuffer, (int *) &yBuffer);
     glViewport(0, 0, xBuffer, yBuffer);
 
-    this->_window->_w = x;
-    this->_window->_h = y;
-    this->_window->_bw = xBuffer;
-    this->_window->_bh = yBuffer;
+    Device::_window->_w = x;
+    Device::_window->_h = y;
+    Device::_window->_bw = xBuffer;
+    Device::_window->_bh = yBuffer;
+    worldData->w = xBuffer;
+    worldData->h = yBuffer;
     return 0;
 }
 
@@ -94,7 +96,7 @@ void Device::getWindowsSize(int &width, int &height, int windowID) {
 }
 
 void Device::error_callback(int error, const char *description) {
-    return;
+
 }
 
 void Device::key_callback(GLFWwindow *window, int key, int scancode, int action, int mods) {
@@ -113,27 +115,27 @@ void Device::processInput() {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        worldData.camera.ProcessKeyboard(FORWARD, worldData.deltaTime);
+        worldData->camera.ProcessKeyboard(FORWARD, worldData->deltaTime);
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        worldData.camera.ProcessKeyboard(BACKWARD, worldData.deltaTime);
+        worldData->camera.ProcessKeyboard(BACKWARD, worldData->deltaTime);
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        worldData.camera.ProcessKeyboard(LEFT, worldData.deltaTime);
+        worldData->camera.ProcessKeyboard(LEFT, worldData->deltaTime);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        worldData.camera.ProcessKeyboard(RIGHT, worldData.deltaTime);
+        worldData->camera.ProcessKeyboard(RIGHT, worldData->deltaTime);
 
 }
 
 void Device::mouse_move_callback(GLFWwindow *window, double xpos, double ypos) {
-    if (worldData.firstMouse) {
-        worldData.lastX = xpos;
-        worldData.lastY = ypos;
-        worldData.firstMouse = false;
+    if (worldData->firstMouse) {
+        worldData->lastX = xpos;
+        worldData->lastY = ypos;
+        worldData->firstMouse = false;
     }
-    float xoffset = xpos - worldData.lastX;
-    float yoffset = worldData.lastY - ypos;
-    worldData.lastX = xpos;
-    worldData.lastY = ypos;
-    worldData.camera.ProcessMouseMovement(xoffset, yoffset);
+    float xoffset = xpos - worldData->lastX;
+    float yoffset = worldData->lastY - ypos;
+    worldData->lastX = xpos;
+    worldData->lastY = ypos;
+    worldData->camera.ProcessMouseMovement(xoffset, yoffset);
 }
 
 void Device::framebuffer_size_callback(GLFWwindow *window, int width, int height) {
@@ -141,7 +143,7 @@ void Device::framebuffer_size_callback(GLFWwindow *window, int width, int height
 }
 
 void Device::scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
-    worldData.camera.ProcessMouseScroll(yoffset);
+    worldData->camera.ProcessMouseScroll(yoffset);
 }
 
 void Device::mouse_button_callback(GLFWwindow *window, int button, int action, int mods) {
@@ -180,4 +182,9 @@ void Device::shutDown() {
 
 float Device::getTime() {
     return glfwGetTime();
+}
+void Device::VSYNC(bool on)
+{
+
+    glfwSwapInterval((int)on);
 }

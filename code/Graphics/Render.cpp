@@ -30,16 +30,16 @@ int Render::init() {
 }
 
 int Render::draw() {
-    float &currentFrame = worldData.currentFrame;
+    float &currentFrame = worldData->currentFrame;
 
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glViewport(0, 0, worldData.SCR_WIDTH, worldData.SCR_HEIGHT);
+    glViewport(0, 0, worldData->d->_window->_bw, worldData->d->_window->_bh);
 
-    glm::mat4 projection = glm::perspective(worldData.camera.Zoom,
-                                            float(worldData.SCR_WIDTH) / float(worldData.SCR_HEIGHT),
+    glm::mat4 projection = glm::perspective(worldData->camera.Zoom,
+                                            float(worldData->w) / float(worldData->h),
                                             0.1f, 100.0f);
-    glm::mat4 view = worldData.camera.GetViewMatrix();
+    glm::mat4 view = worldData->camera.GetViewMatrix();
     glm::mat4 model = glm::mat4(1.0f);
     glm::vec3 lightPos = glm::vec3(3 * cos(currentFrame), 3, 3 * sin(currentFrame));
 
@@ -48,15 +48,15 @@ int Render::draw() {
     model = scale(model, glm::vec3(0.1f));
     model = translate(model, glm::vec3(0, -2.0, 0));
     model = rotate(model, glm::radians(-90.0f), glm::vec3(0, 1, 0));
-    characters[0]->draw(model, view, projection, worldData.camera.Position, lightPos, currentFrame);
+    characters[0]->draw(model, view, projection, worldData->camera.Position, lightPos, currentFrame);
 
     model = glm::mat4(1.0f);
     model = scale(model, glm::vec3(0.05f));
     model = translate(model, glm::vec3(0, -2.0, 0));
     model = rotate(model, glm::radians(-90.0f), glm::vec3(1, 0, 0));
-    characters[1]->draw(model, view, projection, worldData.camera.Position, lightPos, currentFrame);
+    characters[1]->draw(model, view, projection, worldData->camera.Position, lightPos, currentFrame);
 
     model = translate(model, glm::vec3(-10, 0.0, 0));
-    characters[1]->draw(model, view, projection, worldData.camera.Position, lightPos, currentFrame);
+    characters[1]->draw(model, view, projection, worldData->camera.Position, lightPos, currentFrame);
     return 0;
 }
