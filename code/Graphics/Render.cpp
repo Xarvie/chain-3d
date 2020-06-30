@@ -32,7 +32,7 @@ int Render::init() {
         shader[SHADER_LOGIC_TYPE::SHADER_LOGIC_TYPE_DEPTH_ANIM] = new Shader(SHADER_DIR"ShadowMappingDepthSkeletal.vert.glsl", SHADER_DIR"ShadowMappingDepthSkeletal.frag.glsl");
     }
     if (shader[SHADER_LOGIC_TYPE::SHADER_LOGIC_TYPE_DEBUG] == nullptr) {
-        shader[SHADER_LOGIC_TYPE::SHADER_LOGIC_TYPE_DEBUG] = new Shader(SHADER_DIR"debug_shadow_mapping.vs", SHADER_DIR"debug_shadow_mapping.fs");
+        shader[SHADER_LOGIC_TYPE::SHADER_LOGIC_TYPE_DEBUG] = new Shader(SHADER_DIR"DebugShadowMapping.vert.glsl", SHADER_DIR"DebugShadowMapping.frag.glsl");
     }
 
 
