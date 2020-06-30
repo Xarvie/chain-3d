@@ -11,23 +11,14 @@
 #include <string>
 #include <vector>
 
-enum SHADER_LOGIC_TYPE
-{
-    SHADER_LOGIC_TYPE_ANIM_MODEL = 0,
-    SHADER_LOGIC_TYPE_STATIC_MODEL = 1,
-    END
-};
 class Shader;
 
 class Model {
 public:
     int load(std::string str);
-    void draw(glm::mat4 M, glm::mat4 V, glm::mat4 P, glm::vec3 cameraPos, glm::vec3 lightPos, float currentFrame);
-
+    void draw(int isDepth, Shader * curShader, glm::mat4 M, glm::mat4 V, glm::mat4 P, glm::vec3 cameraPos, glm::vec3 lightPos, float currentFrame);
 protected:
-    std::vector<SkeletalMesh*> AniMeshes;
-    std::vector<SkeletalMesh*> staticMeshes;
-    static std::vector<Shader *> shader;
+    SkeletalMesh* mesh = nullptr;
 };
 
 

@@ -34,7 +34,7 @@ public:
 
     void draw();
 
-    unsigned int numBones() const {
+    [[maybe_unused]] [[nodiscard]] unsigned int numBones() const {
         return _numBones;
     }
 
@@ -48,8 +48,8 @@ private:
     static const unsigned int NUM_BONES_PER_VERTEX = 4;
 
     struct BoneInfo {
-        glm::mat4 _boneOffset;
-        glm::mat4 _finalTransformation;
+        glm::mat4 _boneOffset{};
+        glm::mat4 _finalTransformation{};
 
         BoneInfo() {
             _boneOffset = glm::mat4(0);
@@ -58,15 +58,15 @@ private:
     };
 
     struct VertexBoneData {
-        unsigned int _IDs[NUM_BONES_PER_VERTEX];
-        float _weights[NUM_BONES_PER_VERTEX];
+        unsigned int _ids[NUM_BONES_PER_VERTEX]{};
+        float _weights[NUM_BONES_PER_VERTEX]{};
 
         VertexBoneData() {
             reset();
         };
 
         void reset() {
-            for (auto &i:_IDs)
+            for (auto &i:_ids)
                 i = 0;
             for (auto &i:_weights)
                 i = 0;
@@ -84,8 +84,8 @@ private:
         BONE_VB,
         NUM_VBs
     };
-    GLuint _MESH_VAO = 0;
-    GLuint _buffers[NUM_VBs];
+    GLuint _meshVAO = 0;
+    GLuint _buffers[NUM_VBs]{};
 
     struct MeshData {
         MeshData() {
@@ -98,7 +98,7 @@ private:
         unsigned int numIndices;
         unsigned int baseVertex;
         unsigned int baseIndex;
-        unsigned int materialIndex;
+        [[maybe_unused]] unsigned int materialIndex;
         std::vector<Texture> _textures;
     };
 
@@ -120,23 +120,23 @@ private:
 
     void readNodeHierarchy(float animationTime, const aiNode *pNode, const glm::mat4 &parentTransform);
 
-    const aiNodeAnim *findNodeAnim(const aiAnimation *pAnim, const std::string nodeName);
+    static const aiNodeAnim *findNodeAnim(const aiAnimation *pAnim, const std::string& nodeName);
 
-    void calcInterpolatedScaling(aiVector3D &out, float animationTime, const aiNodeAnim *pNodeAnim);
+    static void calcInterpolatedScaling(aiVector3D &out, float animationTime, const aiNodeAnim *pNodeAnim);
 
-    void calcInterpolatedRotation(aiQuaternion &out, float animationTime, const aiNodeAnim *pNodeAnim);
+    static void calcInterpolatedRotation(aiQuaternion &out, float animationTime, const aiNodeAnim *pNodeAnim);
 
-    void calcInterpolatedPosition(aiVector3D &Out, float animationTime, const aiNodeAnim *pNodeAnim);
+    static void calcInterpolatedPosition(aiVector3D &Out, float animationTime, const aiNodeAnim *pNodeAnim);
 
-    unsigned int findScaling(float animationTime, const aiNodeAnim *pNodeAnim);
+    static unsigned int findScaling(float animationTime, const aiNodeAnim *pNodeAnim);
 
-    unsigned int findRotation(float animationTime, const aiNodeAnim *pNodeAnim);
+    static unsigned int findRotation(float animationTime, const aiNodeAnim *pNodeAnim);
 
-    unsigned int findPosition(float animationTime, const aiNodeAnim *pNodeAnim);
+    static unsigned int findPosition(float animationTime, const aiNodeAnim *pNodeAnim);
 
-    glm::mat4 toGlmMat4(const aiMatrix4x4 &m);
+    static glm::mat4 toGlmMat4(const aiMatrix4x4 &m);
 
-    glm::mat4 toGlmMat4(const aiMatrix3x3 &m);
+    static glm::mat4 toGlmMat4(const aiMatrix3x3 &m);
 
     void clear();
 
@@ -147,7 +147,7 @@ private:
     std::map<std::string, unsigned int> _boneMapping;
     unsigned int _numBones;
     std::vector<BoneInfo> _boneInfo;
-    glm::mat4 _globalInverseTransform;
+    glm::mat4 _globalInverseTransform{};
 
     const aiScene *_pScene;
     Assimp::Importer _importer;

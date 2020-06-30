@@ -69,6 +69,13 @@ public:
     Device * d = nullptr;
     int w = 0;
     int h = 0;
+
+    int SHADOW_WIDTH = 2048;
+    int SHADOW_HEIGHT = 2048;
+
+    glm::mat4 lightSpaceMatrix;
+
+    int shadowOn = 1;
 };
 
 extern WorldData* worldData;

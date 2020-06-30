@@ -1,4 +1,3 @@
-#include "Device.h"
 #include "Render.h"
 #include "Data.h"
 #include <iostream>
@@ -12,6 +11,7 @@ int main() {
     d.VSYNC(true);
     Render r;
     r.init();
+
 
     while (d.shouldClose()) {
         d.processInput();

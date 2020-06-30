@@ -16,7 +16,7 @@ enum {
 void SkeletalMesh::VertexBoneData::addBoneData(unsigned int BoneID, float Weight) {
     for (unsigned int i = 0; i < NUM_BONES_PER_VERTEX; i++) {
         if (_weights[i] == 0.0) {
-            _IDs[i] = BoneID;
+            _ids[i] = BoneID;
             _weights[i] = Weight;
             return;
         }
@@ -25,11 +25,11 @@ void SkeletalMesh::VertexBoneData::addBoneData(unsigned int BoneID, float Weight
 }
 
 SkeletalMesh::SkeletalMesh() {
-    _MESH_VAO = 0;
+    _meshVAO = 0;
     for (auto &i:_buffers)
         i = 0;
     _numBones = 0;
-    _pScene = NULL;
+    _pScene = nullptr;
 }
 
 
@@ -42,16 +42,16 @@ void SkeletalMesh::clear() {
         glDeleteBuffers(NUM_VBs, _buffers);
     }
 
-    if (_MESH_VAO != 0) {
-        glDeleteVertexArrays(1, &_MESH_VAO);
-        _MESH_VAO = 0;
+    if (_meshVAO != 0) {
+        glDeleteVertexArrays(1, &_meshVAO);
+        _meshVAO = 0;
     }
 }
 
 
 bool SkeletalMesh::loadMesh(const std::string &filename) {
     clear();
-    std::string::size_type SlashIndex = filename.find_last_of("/");
+    std::string::size_type SlashIndex = filename.find_last_of('/');
 
     if (SlashIndex == std::string::npos) {
         _dir = ".";
@@ -61,8 +61,8 @@ bool SkeletalMesh::loadMesh(const std::string &filename) {
         _dir = filename.substr(0, SlashIndex);
     }
 
-    glGenVertexArrays(1, &_MESH_VAO);
-    glBindVertexArray(_MESH_VAO);
+    glGenVertexArrays(1, &_meshVAO);
+    glBindVertexArray(_meshVAO);
     glGenBuffers(NUM_VBs, _buffers);
 
     bool Ret = false;
@@ -116,7 +116,7 @@ bool SkeletalMesh::initFromScene(const aiScene *pScene, const std::string &filen
         NumVertices += pScene->mMeshes[i]->mNumVertices;
         NumIndices += _meshData[i].numIndices;
 
-        int MaterialIndex = pScene->mMeshes[i]->mMaterialIndex;
+        int MaterialIndex = (int)pScene->mMeshes[i]->mMaterialIndex;
         initMeshMaterial(pScene->mMaterials[MaterialIndex], _meshData[i]._textures);
     }
 
@@ -134,22 +134,22 @@ bool SkeletalMesh::initFromScene(const aiScene *pScene, const std::string &filen
     glBindBuffer(GL_ARRAY_BUFFER, _buffers[POS_VB]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(positions[0]) * positions.size(), &positions[0], GL_STATIC_DRAW);
     glEnableVertexAttribArray(POSITION_LOCATION);
-    glVertexAttribPointer(POSITION_LOCATION, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glVertexAttribPointer(POSITION_LOCATION, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 
     glBindBuffer(GL_ARRAY_BUFFER, _buffers[TEXCOORD_VB]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(texCoords[0]) * texCoords.size(), &texCoords[0], GL_STATIC_DRAW);
     glEnableVertexAttribArray(TEX_COORD_LOCATION);
-    glVertexAttribPointer(TEX_COORD_LOCATION, 2, GL_FLOAT, GL_FALSE, 0, 0);
+    glVertexAttribPointer(TEX_COORD_LOCATION, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
 
     glBindBuffer(GL_ARRAY_BUFFER, _buffers[NORMAL_VB]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(normals[0]) * normals.size(), &normals[0], GL_STATIC_DRAW);
     glEnableVertexAttribArray(NORMAL_LOCATION);
-    glVertexAttribPointer(NORMAL_LOCATION, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glVertexAttribPointer(NORMAL_LOCATION, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 
     glBindBuffer(GL_ARRAY_BUFFER, _buffers[BONE_VB]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(bones[0]) * bones.size(), &bones[0], GL_STATIC_DRAW);
     glEnableVertexAttribArray(BONE_ID_LOCATION);
-    glVertexAttribIPointer(BONE_ID_LOCATION, 4, GL_INT, sizeof(VertexBoneData), (const GLvoid *) 0);
+    glVertexAttribIPointer(BONE_ID_LOCATION, 4, GL_INT, sizeof(VertexBoneData), (const GLvoid *) nullptr);
     glEnableVertexAttribArray(BONE_WEIGHT_LOCATION);
     glVertexAttribPointer(BONE_WEIGHT_LOCATION, 4, GL_FLOAT, GL_FALSE, sizeof(VertexBoneData), (const GLvoid *) 16);
 
@@ -227,7 +227,7 @@ Texture SkeletalMesh::loadMaterialFile(const aiMaterial *pMaterial, aiTextureTyp
 
 void SkeletalMesh::loadBones(unsigned int MeshIndex, const aiMesh *pMesh, std::vector<VertexBoneData> &bones) {
     for (unsigned int i = 0; i < pMesh->mNumBones; i++) {
-        unsigned int BoneIndex = 0;
+        unsigned int BoneIndex;
         std::string BoneName(pMesh->mBones[i]->mName.data);
 
         if (_boneMapping.find(BoneName) == _boneMapping.end()) {
@@ -251,31 +251,31 @@ void SkeletalMesh::loadBones(unsigned int MeshIndex, const aiMesh *pMesh, std::v
 
 
 void SkeletalMesh::draw() {
-    glBindVertexArray(_MESH_VAO);
-
-    for (unsigned int i = 0; i < _meshData.size(); i++) {
-        for (int j = 0; j < _meshData[i]._textures.size(); ++j) {
+    glBindVertexArray(_meshVAO);
+    const int SHADOW_INDEX = 1;
+    for (auto & meshData : _meshData) {
+        for (auto & _texture : meshData._textures) {
             std::string n;
-            switch (_meshData[i]._textures[j].getTextureType()) {
+            switch (_texture.getTextureType()) {
                 case DIFFUSE:
                     n = "diffuseTexture";
-                    _meshData[i]._textures[j].bind(GL_TEXTURE0);
+                    _texture.bind(GL_TEXTURE0+SHADOW_INDEX);
                     break;
                 case SPECULAR:
                     n = "specularTexture";
-                    _meshData[i]._textures[j].bind(GL_TEXTURE1);
+                    _texture.bind(GL_TEXTURE1+SHADOW_INDEX);
                     break;
                 case NORMAL:
                     n = "normalTexture";
-                    _meshData[i]._textures[j].bind(GL_TEXTURE2);
+                    _texture.bind(GL_TEXTURE2+SHADOW_INDEX);
                     break;
                 default:
                     break;
             }
         }
-        glDrawElementsBaseVertex(GL_TRIANGLES, _meshData[i].numIndices, GL_UNSIGNED_INT,
-                                 (void *) (sizeof(unsigned int) * _meshData[i].baseIndex),
-                                 _meshData[i].baseVertex);
+        glDrawElementsBaseVertex(GL_TRIANGLES, meshData.numIndices, GL_UNSIGNED_INT,
+                                 (void *) (sizeof(unsigned int) * meshData.baseIndex),
+                                 meshData.baseVertex);
     }
     glBindVertexArray(0);
 }
@@ -285,7 +285,7 @@ void SkeletalMesh::boneTransform(float timeInSeconds, std::vector<glm::mat4> &tr
     glm::mat4 identity(1.0);
     if (_pScene->mAnimations == nullptr)
         return;
-    float TicksPerSecond = (float) (_pScene->mAnimations[0]->mTicksPerSecond != 0
+    auto TicksPerSecond = (float) (_pScene->mAnimations[0]->mTicksPerSecond != 0
                                     ? _pScene->mAnimations[0]->mTicksPerSecond : 25.0f);
     float TimeInTicks = timeInSeconds * TicksPerSecond;
     float AnimationTime = fmod(TimeInTicks, (float) _pScene->mAnimations[0]->mDuration);
@@ -340,7 +340,7 @@ void SkeletalMesh::readNodeHierarchy(float animationTime, const aiNode *pNode, c
     }
 }
 
-const aiNodeAnim *SkeletalMesh::findNodeAnim(const aiAnimation *pAnim, const std::string nodeName) {
+const aiNodeAnim *SkeletalMesh::findNodeAnim(const aiAnimation *pAnim, const std::string& nodeName) {
     for (unsigned int i = 0; i < pAnim->mNumChannels; i++) {
         const aiNodeAnim *pNodeAnim = pAnim->mChannels[i];
 
@@ -349,7 +349,7 @@ const aiNodeAnim *SkeletalMesh::findNodeAnim(const aiAnimation *pAnim, const std
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 
@@ -362,7 +362,7 @@ void SkeletalMesh::calcInterpolatedPosition(aiVector3D &out, float animationTime
     unsigned int PositionIndex = findPosition(animationTime, pNodeAnim);
     unsigned int NextPositionIndex = (PositionIndex + 1);
     assert(NextPositionIndex < pNodeAnim->mNumPositionKeys);
-    float deltaTime = (float) (pNodeAnim->mPositionKeys[NextPositionIndex].mTime -
+    auto deltaTime = (float) (pNodeAnim->mPositionKeys[NextPositionIndex].mTime -
                                pNodeAnim->mPositionKeys[PositionIndex].mTime);
     float factor = (animationTime - (float) pNodeAnim->mPositionKeys[PositionIndex].mTime) / deltaTime;
     assert(factor >= 0.0f && factor <= 1.0f);
@@ -382,7 +382,7 @@ void SkeletalMesh::calcInterpolatedRotation(aiQuaternion &out, float animationTi
     unsigned int RotationIndex = findRotation(animationTime, pNodeAnim);
     unsigned int NextRotationIndex = (RotationIndex + 1);
     assert(NextRotationIndex < pNodeAnim->mNumRotationKeys);
-    float DeltaTime = (float) (pNodeAnim->mRotationKeys[NextRotationIndex].mTime -
+    auto DeltaTime = (float) (pNodeAnim->mRotationKeys[NextRotationIndex].mTime -
                                pNodeAnim->mRotationKeys[RotationIndex].mTime);
     float Factor = (animationTime - (float) pNodeAnim->mRotationKeys[RotationIndex].mTime) / DeltaTime;
     assert(Factor >= 0.0f && Factor <= 1.0f);
@@ -402,7 +402,7 @@ void SkeletalMesh::calcInterpolatedScaling(aiVector3D &out, float animationTime,
     unsigned int scalingIndex = findScaling(animationTime, pNodeAnim);
     unsigned int nextScalingIndex = (scalingIndex + 1);
     assert(nextScalingIndex < pNodeAnim->mNumScalingKeys);
-    float DeltaTime = (float) (pNodeAnim->mScalingKeys[nextScalingIndex].mTime -
+    auto DeltaTime = (float) (pNodeAnim->mScalingKeys[nextScalingIndex].mTime -
                                pNodeAnim->mScalingKeys[scalingIndex].mTime);
     float Factor = (animationTime - (float) pNodeAnim->mScalingKeys[scalingIndex].mTime) / DeltaTime;
     assert(Factor >= 0.0f && Factor <= 1.0f);
@@ -450,10 +450,10 @@ unsigned int SkeletalMesh::findScaling(float animationTime, const aiNodeAnim *pN
 
 glm::mat4 SkeletalMesh::toGlmMat4(const aiMatrix4x4 &m) {
     glm::mat4 matrix = glm::make_mat4(&m[0][0]);
-    return std::move(glm::transpose(matrix));
+    return glm::transpose(matrix);
 }
 
 glm::mat4 SkeletalMesh::toGlmMat4(const aiMatrix3x3 &m) {
     glm::mat3 matrix = glm::make_mat3(&m[0][0]);
-    return std::move(glm::transpose(glm::mat4(matrix)));
+    return glm::transpose(glm::mat4(matrix));
 }

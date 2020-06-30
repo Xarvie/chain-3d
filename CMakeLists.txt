@@ -48,7 +48,7 @@ set(LIBS ${LIBS} ${ASSIMP_LIBRARY})
 
 #include_directories(C:/Users/Xarvie/Desktop/Assimp/include)
 #link_directories(C:/Users/Xarvie/Desktop/Assimp/lib)
-link_directories(${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/lib)
+#link_directories(${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/lib)
 
 set(SDL 0)
 set(GLFW 1)
