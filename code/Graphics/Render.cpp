@@ -4,19 +4,10 @@
 
 #include "Render.h"
 
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-
 #include <Graphics/Camera.h>
 #include <Graphics/Shader.h>
 
-#include <iostream>
-#include <unordered_map>
 #include "Config.h"
-
 #include "Model.h"
 #include "Data.h"
 
@@ -25,6 +16,10 @@ unsigned int Render::depthMapFBO = 0;
 unsigned int Render::depthMap = 0;
 
 int Render::init() {
+    worldData->proj = glm::perspective(worldData->camera.Zoom,
+                                       float(worldData->w) / float(worldData->h),
+                                       0.1f, 50.0f);
+
     if (shader[SHADER_LOGIC_TYPE::SHADER_LOGIC_TYPE_ANIM_MODEL_WITH_SHADOW] == nullptr) {
         shader[SHADER_LOGIC_TYPE::SHADER_LOGIC_TYPE_ANIM_MODEL_WITH_SHADOW] = new Shader(SHADER_DIR"SkeletalModelWithShadow.vert.glsl", SHADER_DIR"SkeletalModelWithShadow.frag.glsl");
     }
@@ -102,6 +97,7 @@ int Render::draw() {
     }
 
 
+
     //showDepthMap();
 
     return 0;
@@ -149,7 +145,6 @@ void Render::showDepthMap() {
 
 int Render::drawModels(DRAW_TYPE type) {
     float &currentFrame = worldData->currentFrame;
-
     Shader * curShader = nullptr;
 
     if(type == DRAW_TYPE::DRAW_TYPE_ANIM_MODEL_WITH_SHADOW || type == DRAW_TYPE::DRAW_TYPE_ANIM_MODEL)
@@ -164,11 +159,8 @@ int Render::drawModels(DRAW_TYPE type) {
     if(curShader == nullptr)
         return -1;
     curShader->use();
-
-    glm::mat4 projection = glm::perspective(worldData->camera.Zoom,
-                                            float(worldData->w) / float(worldData->h),
-                                            0.1f, 50.0f);
-    glm::mat4 view = worldData->camera.GetViewMatrix();
+    glm::mat4 projection = worldData->proj;
+    glm::mat4 view = worldData->camera.getViewMatrix();
     glm::mat4 model = glm::mat4(1.0f);
     glm::vec3 lightPos = glm::vec3(3 * cos(currentFrame), 3, 3 * sin(currentFrame));
 
@@ -192,6 +184,7 @@ int Render::drawModels(DRAW_TYPE type) {
     model = scale(model, glm::vec3(1.0f));
     model = translate(model, glm::vec3(0, -2.0, 0));
     model = rotate(model, glm::radians(-90.0f), glm::vec3(0, 1, 0));
+
     staticModels[0]->draw(type, curShader, model, view, projection, worldData->camera.Position, lightPos, currentFrame);
 
     model = glm::mat4(1.0f);
@@ -208,15 +201,15 @@ int Render::drawModels(DRAW_TYPE type) {
 
 void Render::getDepthMap() {
     float &currentFrame = worldData->currentFrame;
-
     glViewport(0, 0, worldData->SHADOW_WIDTH, worldData->SHADOW_HEIGHT);
     glBindFramebuffer(GL_FRAMEBUFFER, Render::depthMapFBO);
+
     glClear(GL_DEPTH_BUFFER_BIT);
     drawModels(DRAW_TYPE::DRAW_TYPE_DEPTH);
+
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     glViewport(0, 0, worldData->w, worldData->h);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void Render::drawModelWithShadow(bool shadowOn) {

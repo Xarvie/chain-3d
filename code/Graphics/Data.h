@@ -76,6 +76,8 @@ public:
     glm::mat4 lightSpaceMatrix;
 
     int shadowOn = 1;
+
+    glm::mat4 proj;
 };
 
 extern WorldData* worldData;

@@ -15,7 +15,8 @@
 enum TextureEnum {
     DIFFUSE,
     SPECULAR,
-    NORMAL
+    NORMAL,
+    IMAGE
 };
 
 class Texture {
@@ -33,7 +34,7 @@ public:
 
     TextureEnum getTextureType() { return m_textureType; }
 
-private:
+public:
 
     std::string m_fileName;
     GLenum m_textureTarget;

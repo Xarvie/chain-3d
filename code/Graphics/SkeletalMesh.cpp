@@ -156,6 +156,7 @@ bool SkeletalMesh::initFromScene(const aiScene *pScene, const std::string &filen
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _buffers[INDEX_BUFFER]);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices[0]) * indices.size(), &indices[0], GL_STATIC_DRAW);
 
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
     return true;
 }
 
@@ -273,10 +274,13 @@ void SkeletalMesh::draw() {
                     break;
             }
         }
+
         glDrawElementsBaseVertex(GL_TRIANGLES, meshData.numIndices, GL_UNSIGNED_INT,
                                  (void *) (sizeof(unsigned int) * meshData.baseIndex),
                                  meshData.baseVertex);
+
     }
+
     glBindVertexArray(0);
 }
 

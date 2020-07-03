@@ -1,6 +1,7 @@
 #include "Render.h"
 #include "Data.h"
 #include <iostream>
+#include "Particle.h"
 
 int main() {
     worldData = new WorldData();
@@ -12,12 +13,18 @@ int main() {
     Render r;
     r.init();
 
+    Particle p;
+    p.init();
+
 
     while (d.shouldClose()) {
         d.processInput();
 
         worldData->updateTime(d.getTime());
+
         r.draw();
+
+        p.draw();
 
         d.swapBuffers();
         d.pollEvents();

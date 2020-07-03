@@ -66,7 +66,7 @@ int Device::createWindow(std::string title, int x, int y, int fullScreen, int lo
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_MULTISAMPLE);
-    glEnable(GL_CULL_FACE);
+    //glEnable(GL_CULL_FACE);
 
     glfwWindowHint(GLFW_SAMPLES, 2);
     glEnable(GL_BLEND);
@@ -105,6 +105,17 @@ void Device::key_callback(GLFWwindow *window, int key, int scancode, int action,
     switch (key) {
         case GLFW_KEY_ESCAPE:
             break;
+        case GLFW_KEY_V:
+        {
+            static int LineMode = GL_FILL;
+            if (LineMode == GL_FILL) {
+                LineMode = GL_LINE;
+            } else {
+                LineMode = GL_FILL;
+            }
+            glPolygonMode(GL_FRONT_AND_BACK, LineMode);
+            break;
+        }
         default:
             break;
     }
