@@ -116,6 +116,7 @@ int Particle::init()
 
 int Particle::draw()
 {
+    glActiveTexture(GL_TEXTURE0);
     //computeMatricesFromInputs();
     //glm::mat4 ProjectionMatrix = getProjectionMatrix();
     glBindVertexArray(vertexArrayID);
@@ -145,7 +146,7 @@ int Particle::draw()
     for(int i=0; i<newparticles; i++){
         int particleIndex = FindUnusedParticle();
         ParticlesContainer[particleIndex].life = 5.0f; // This particle will live 5 seconds.
-        ParticlesContainer[particleIndex].pos = glm::vec3(0,0,-20.0f);
+        ParticlesContainer[particleIndex].pos = glm::vec3(0,0,0.0f);
 
         float spread = 1.5f;
         glm::vec3 maindir = glm::vec3(0.0f, 10.0f, 0.0f);

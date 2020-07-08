@@ -137,7 +137,7 @@ public:
     }
 
     void setVec3(const std::string &name, float x, float y, float z) const {
-        int l = glGetUniformLocation(ID, name.c_str());
+        int l = glGetUniformLocation(ID, name.c_str());//TODO 这里需要优化掉,初始化获取Location
         if (l == -1)
             std::cout << name << std::endl;
         //assert(l != -1);

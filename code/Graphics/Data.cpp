@@ -27,4 +27,5 @@ void WorldData::init() {
     ro = -1.5f;
 
     d = new Device();
+
 }

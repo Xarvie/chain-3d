@@ -1,6 +1,8 @@
 #version 330 core
 
-out vec4 fragColor;
+layout (location = 0) out vec4 FragColor;
+layout (location = 1) out vec4 BrightColor;
+
 
 struct Light {
     vec3 direction;
@@ -35,7 +37,7 @@ float ShadowCalculation(vec4 fragPosLightSpace)
     // calculate bias (based on depth map resolution and slope)
     vec3 normal = normalize(normal);
     vec3 lightDir = normalize(-light.direction);
-    float bias = max(0.02 * (1.0 - dot(normal, lightDir)), 0.002);
+    float bias = max(0.001 * (1.0 - dot(normal, lightDir)), 0.001);
 
     // PCF
     float shadow = 0.0;
@@ -51,7 +53,7 @@ float ShadowCalculation(vec4 fragPosLightSpace)
     shadow /= 9.0;
 
     if(projCoords.z > 1.0)
-        shadow = 0.0;
+    shadow = 0.0;
 
     return shadow / 4;
 }
@@ -59,8 +61,8 @@ float ShadowCalculation(vec4 fragPosLightSpace)
 void main(){
     vec3 result = vec3(0);
 
-    vec3 lightColor = vec3(1.0);
-    float lightPower = 4.0f;
+    vec3 lightColor = vec3(0.3,0.1,0.3);
+    float lightPower = 8.0f;
 
 
     vec3 diffuseMaterial = texture(diffuseTexture, uv).rgb;
@@ -81,11 +83,17 @@ void main(){
     vec3 diffuseColor = diffuseMaterial;
     //vec3 specularColor = specularMaterial*lightColor*pow(cosAlpha,16)*vec3(0.5);
 
-    // calculate shadow
     float shadow = ShadowCalculation(FragPosLightSpace);
     if(shadowOn == 1)
-        result += ambientColor + (1.0 - shadow)*(diffuseColor*attenuation*lightPower);
+    result += ambientColor + (1.0 - shadow)*(diffuseColor*attenuation*lightPower);
     else
-        result += ambientColor + (diffuseColor*attenuation*lightPower);
-    fragColor = vec4(result, 1.0);
+    result += ambientColor + (diffuseColor*attenuation*lightPower);
+
+
+    float brightness = dot(result, vec3(0.2126, 0.7152, 0.0722));
+    if(brightness > 1.0)
+        BrightColor = vec4(result, 1.0);
+    else
+        BrightColor = vec4(0.0, 0.0, 0.0, 1.0);
+    FragColor = vec4(result, 1.0);
 }

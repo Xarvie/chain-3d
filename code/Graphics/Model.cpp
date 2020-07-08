@@ -19,7 +19,7 @@ int Model::load(std::string str) {
 }
 
 
-void Model::draw(int isDepth, Shader *curShader, glm::mat4 M, glm::mat4 V, glm::mat4 P, glm::vec3 cameraPos, glm::vec3 lightPos,
+void Model::draw(int isDepth, int bloom,  Shader *curShader, glm::mat4 M, glm::mat4 V, glm::mat4 P,
                  float currentFrame) {
     glm::mat4 MVP = P * V * M;
     curShader->setMat4("M", M);

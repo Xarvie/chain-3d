@@ -1,7 +1,8 @@
 #include "Render.h"
 #include "Data.h"
 #include <iostream>
-#include "Particle.h"
+#include <chrono>
+#include <thread>
 
 int main() {
     worldData = new WorldData();
@@ -9,13 +10,13 @@ int main() {
     d.init();
     d.createWindow("ChainProject", 1024, 768, 0, 1);
 
-    d.VSYNC(true);
+    d.VSYNC(worldData->vsync);
     Render r;
     r.init();
 
-    Particle p;
-    p.init();
 
+
+    worldData->lastFrame = d.getTime();
 
     while (d.shouldClose()) {
         d.processInput();
@@ -24,10 +25,11 @@ int main() {
 
         r.draw();
 
-        p.draw();
+
 
         d.swapBuffers();
         d.pollEvents();
+
 
     }
     d.shutDown();

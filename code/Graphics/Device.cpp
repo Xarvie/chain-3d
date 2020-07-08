@@ -64,12 +64,7 @@ int Device::createWindow(std::string title, int x, int y, int fullScreen, int lo
         return -1;
     }
 
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_MULTISAMPLE);
-    //glEnable(GL_CULL_FACE);
 
-    glfwWindowHint(GLFW_SAMPLES, 2);
-    glEnable(GL_BLEND);
     int xBuffer = 0, yBuffer = 0;
     glfwGetFramebufferSize(window, (int *) &xBuffer, (int *) &yBuffer);
     glViewport(0, 0, xBuffer, yBuffer);
@@ -99,6 +94,10 @@ void Device::error_callback(int error, const char *description) {
 
 }
 
+static bool GUIMode = false;
+static double mouseX = 0;
+static double mouseY = 0;
+
 void Device::key_callback(GLFWwindow *window, int key, int scancode, int action, int mods) {
     if (action != GLFW_PRESS)
         return;
@@ -114,6 +113,36 @@ void Device::key_callback(GLFWwindow *window, int key, int scancode, int action,
                 LineMode = GL_FILL;
             }
             glPolygonMode(GL_FRONT_AND_BACK, LineMode);
+            break;
+        }
+        case GLFW_KEY_F1:
+        {
+
+            GUIMode = !GUIMode;
+            if (GUIMode) {
+                glfwGetCursorPos(window, &mouseX, &mouseY);
+                //glfwSetCursorPos(window, 1, 1);
+                glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+
+            } else {
+                glfwSetCursorPos(window, mouseX, mouseY);
+                glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+            }
+            break;
+        }
+        case GLFW_KEY_F2:
+        {
+            worldData->shadowOn = !worldData->shadowOn;
+            break;
+        }
+        case GLFW_KEY_F3:
+        {
+            worldData->particleOn = !worldData->particleOn;
+            break;
+        }
+        case GLFW_KEY_F4:
+        {
+            worldData->bloomOn = !worldData->bloomOn;
             break;
         }
         default:
@@ -137,6 +166,8 @@ void Device::processInput() {
 }
 
 void Device::mouse_move_callback(GLFWwindow *window, double xpos, double ypos) {
+    if(GUIMode)
+        return ;
     if (worldData->firstMouse) {
         worldData->lastX = xpos;
         worldData->lastY = ypos;
@@ -154,10 +185,15 @@ void Device::framebuffer_size_callback(GLFWwindow *window, int width, int height
 }
 
 void Device::scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
+    if(GUIMode)
+        return ;
     worldData->camera.ProcessMouseScroll(yoffset);
 }
 
 void Device::mouse_button_callback(GLFWwindow *window, int button, int action, int mods) {
+    if(GUIMode)
+        return ;
+
     if (action == GLFW_PRESS)
         switch (button) {
             case GLFW_MOUSE_BUTTON_LEFT:

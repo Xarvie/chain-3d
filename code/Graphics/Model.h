@@ -16,7 +16,7 @@ class Shader;
 class Model {
 public:
     int load(std::string str);
-    void draw(int isDepth, Shader * curShader, glm::mat4 M, glm::mat4 V, glm::mat4 P, glm::vec3 cameraPos, glm::vec3 lightPos, float currentFrame);
+    void draw(int isDepth, int bloom, Shader * curShader, glm::mat4 M, glm::mat4 V, glm::mat4 P, float currentFrame);
 protected:
     SkeletalMesh* mesh = nullptr;
 };

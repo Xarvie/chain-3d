@@ -70,14 +70,18 @@ public:
     int w = 0;
     int h = 0;
 
-    int SHADOW_WIDTH = 2048;
-    int SHADOW_HEIGHT = 2048;
+    int SHADOW_WIDTH = 8196;
+    int SHADOW_HEIGHT = 8196;
 
     glm::mat4 lightSpaceMatrix;
 
-    int shadowOn = 1;
-
+    int shadowOn = 0;
+    int bloomOn = 0;
+    int particleOn = 0;
     glm::mat4 proj;
+
+    bool vsync = true;
+    int MSAA = 2;
 };
 
 extern WorldData* worldData;
