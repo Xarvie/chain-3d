@@ -386,8 +386,8 @@ void SkeletalMesh::calcInterpolatedRotation(aiQuaternion &out, float animationTi
     unsigned int RotationIndex = findRotation(animationTime, pNodeAnim);
     unsigned int NextRotationIndex = (RotationIndex + 1);
     assert(NextRotationIndex < pNodeAnim->mNumRotationKeys);
-    auto DeltaTime = (float) (pNodeAnim->mRotationKeys[NextRotationIndex].mTime -
-                               pNodeAnim->mRotationKeys[RotationIndex].mTime);
+    auto DeltaTime = (float) (pNodeAnim->mRotationKeys[NextRotationIndex].mTime - // gltf 416.66 dae 0.66
+                               pNodeAnim->mRotationKeys[RotationIndex].mTime);      // gltf 41.666 dae 0.625
     float Factor = (animationTime - (float) pNodeAnim->mRotationKeys[RotationIndex].mTime) / DeltaTime;
     assert(Factor >= 0.0f && Factor <= 1.0f);
     const aiQuaternion &StartRotationQ = pNodeAnim->mRotationKeys[RotationIndex].mValue;

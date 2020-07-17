@@ -75,12 +75,12 @@ public:
 
     glm::mat4 lightSpaceMatrix;
 
-    int shadowOn = 0;
-    int bloomOn = 0;
-    int particleOn = 0;
+    int shadowOn = 1;
+    int bloomOn = 1;
+    int particleOn = 1;
     glm::mat4 proj;
 
-    bool vsync = true;
+    bool vsync = false;
     int MSAA = 2;
 };
 

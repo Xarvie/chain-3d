@@ -26,9 +26,9 @@ void Model::draw(int isDepth, int bloom,  Shader *curShader, glm::mat4 M, glm::m
     curShader->setMat4("lightSpaceMatrix", worldData->lightSpaceMatrix);
     if(isDepth!=1) {
         curShader->setVec3("light.direction", worldData->light1Pos.x,  worldData->light1Pos.y,  worldData->light1Pos.z);
-        curShader->setVec3("light.ambient", 0.5f, 0.5f, 0.5f);
-        curShader->setVec3("light.diffuse", 1.0f, 1.0f, 1.0f);
-        curShader->setVec3("light.specular", 1.0f, 1.0f, 1.0f);
+        //curShader->setVec3("light.ambient", 0.5f, 0.5f, 0.5f);
+        //curShader->setVec3("light.diffuse", 1.0f, 1.0f, 1.0f);
+        //curShader->setVec3("light.specular", 1.0f, 1.0f, 1.0f);
 
         curShader->setMat4("MVP", MVP);
         curShader->setMat4("lightSpaceMatrix", worldData->lightSpaceMatrix);

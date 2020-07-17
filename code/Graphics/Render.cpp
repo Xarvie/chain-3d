@@ -54,7 +54,7 @@ int Render::init() {
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_MULTISAMPLE);
-    glEnable(GL_CULL_FACE);
+    //glEnable(GL_CULL_FACE);
 
     glfwWindowHint(GLFW_SAMPLES, worldData->MSAA);
     glEnable(GL_BLEND);
@@ -165,7 +165,7 @@ int Render::init() {
     {
         auto x = new Model();
         //int anim = x->load(RES_DIR"untitled.gltf");
-        int anim = x->load(RES_DIR"plane.dae");
+        int anim = x->load(RES_DIR"girl1.dae");
         if (anim)
             animModels.emplace_back(x);
         else
@@ -174,7 +174,8 @@ int Render::init() {
 
     {
         auto x = new Model();
-        int anim = x->load(RES_DIR"bee.dae");
+        //int anim = x->load(RES_DIR"man1.dae");
+        int anim = x->load(RES_DIR"man1.dae");
         if (anim)
             animModels.emplace_back(x);
         else
@@ -228,7 +229,7 @@ int Render::draw() {
 
 
         {
-            curShader->setVec3("viewPos", worldData->camera.Position);
+            //curShader->setVec3("viewPos", worldData->camera.Position);
             curShader->setVec3("lightPos", lightPos);
             curShader->setInt("shadowMap", 0);
             curShader->setInt("diffuseTexture", 1);
@@ -313,7 +314,7 @@ int Render::shaderSetParam(Shader *curShader, DRAW_TYPE type) {
     float &currentFrame = worldData->currentFrame;
     glm::vec3 lightPos = glm::vec3(3 * cos(currentFrame), 3, 3 * sin(currentFrame));
     if (type == DRAW_TYPE::DRAW_TYPE_ANIM_MODEL_WITH_SHADOW || type == DRAW_TYPE::DRAW_TYPE_ANIM_MODEL) {
-        curShader->setVec3("viewPos", worldData->camera.Position);
+        //curShader->setVec3("viewPos", worldData->camera.Position);
         curShader->setVec3("lightPos", lightPos);
         curShader->setInt("shadowMap", 0);
         curShader->setInt("diffuseTexture", 1);
