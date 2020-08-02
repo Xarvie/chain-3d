@@ -22,7 +22,6 @@
 #include "Model.h"
 #include "Data.h"
 
-
 class Device {
 public:
     Device();
@@ -38,7 +37,65 @@ public:
     };
 
     std::vector<Monitor> _monitors;
+#define setbit(x,y)  x|=(1<<y)
+#define clrbit(x,y)  x&=~(1<<y)
+#define reversebit(x,y)  x^=(1<<y)
+#define getbit(x,y)   ((x) >> (y)&1)
 
+    class GamePad{
+    public:
+        enum ControlType{
+            CT_UP = 0,
+            CT_DOWN,
+            CT_LEFT,
+            CT_RIGHT,
+            CT_A,
+            CT_B,
+            CT_X,
+            CT_Y,
+            CT_START,
+            CT_BACK,
+        };
+    public:
+        int up(bool press);
+        int down(bool press);
+        int left(bool press);
+        int right(bool press);
+        int a(bool press);
+        int b(bool press);
+        int x(bool press);
+        int y(bool press);
+
+        int start(bool press);
+        int back(bool press);
+
+
+
+    public:
+        class ControlState{
+        public:
+            unsigned int curStates = 0;
+            unsigned int preStates = 0;
+            unsigned int newDown = 0;
+            unsigned int newUp = 0;
+            int detectControlState();
+
+            int upEvent(bool press);
+            int downEvent(bool press);
+            int leftEvent(bool press);
+            int rightEvent(bool press);
+            int aEvent(bool press);
+            int bEvent(bool press);
+            int xEvent(bool press);
+            int yEvent(bool press);
+
+            int startEvent(bool press);
+            int backEvent(bool press);
+        };
+        ControlState cs;
+
+    };
+    GamePad gp;
     class Window {
     public:
         int _w;

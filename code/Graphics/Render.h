@@ -10,8 +10,10 @@
 #include "Particle.h"
 
 #include "gui.h"
+#include "Terrain.h"
+
 #define USE_GUI
-static bool GUIMode = false;
+extern bool GUIMode;
 
 class Render {
 public:
@@ -23,6 +25,7 @@ public:
         SHADER_LOGIC_TYPE_LIGHT = 3,
         SHADER_LOGIC_TYPE_BLUR = 4,
         SHADER_LOGIC_TYPE_BLOOM_FINAL = 5,
+        SHADER_LOGIC_TYPE_2D = 6,
         END
     };
     enum DRAW_TYPE
@@ -44,16 +47,18 @@ public:
     void getDepthMap();
     void drawModelWithShadow();
 
+    int render2DInit();
+    int render2dDraw();
 public:
     std::vector<Model *> staticModels;
     std::vector<Model *> animModels;
 
     static std::vector<Shader *> shader;
-protected:
+
 
     static unsigned int depthMapFBO;
     static unsigned int depthMap;
-
+protected:
     unsigned int hdrFBO = 0;
     unsigned int rboDepth = 0;
 
@@ -63,8 +68,11 @@ protected:
     unsigned int attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
     unsigned int colorBuffers[2];
     Particle * p = nullptr;
-
+    World * t = nullptr;
     gui *g = nullptr;
+
+    unsigned int texture1, texture2;
+    unsigned int VBO, VAO, EBO;
 };
 
 

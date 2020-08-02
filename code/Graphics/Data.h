@@ -9,10 +9,14 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <GameLogic/Bomber.h>
 
 #include "Graphics/Camera.h"
 
 #include "Device.h"
+
+#include "Collision.h"
+#include "map.h"
 
 class Data {
 
@@ -36,7 +40,7 @@ public:
     int g = 0;
     int b = 0;
 
-
+    glm::vec3 light2Pos;
     glm::vec3 light1Pos;
     glm::vec3 lookCenterPos;
     glm::vec3 lookUpPos;
@@ -70,18 +74,27 @@ public:
     int w = 0;
     int h = 0;
 
-    int SHADOW_WIDTH = 8196;
-    int SHADOW_HEIGHT = 8196;
+    int SHADOW_WIDTH = 8192;
+    int SHADOW_HEIGHT = 8192;
 
     glm::mat4 lightSpaceMatrix;
 
     int shadowOn = 1;
+    float offset1 = 0.4;
+    float offset2 = 1.0;
     int bloomOn = 1;
     int particleOn = 1;
     glm::mat4 proj;
 
-    bool vsync = false;
+    bool vsync = true;
     int MSAA = 2;
+
+    Collision worldCollision;
+
+
+    Map map1;
+    Unit *unit1 = nullptr;
+    Bomber* bomber;
 };
 
 extern WorldData* worldData;

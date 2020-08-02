@@ -8,6 +8,186 @@ Device::Window *Device::_window;
 
 bool isFullScreen = false;
 
+
+int Device::GamePad::up(bool press){
+    if(press)
+        this->cs.curStates |= (1u << ControlType::CT_UP);
+    else
+        this->cs.curStates &= ~(1u << ControlType::CT_UP);
+
+    return 0;
+}
+
+int Device::GamePad::down(bool press){
+    if(press)
+        this->cs.curStates |= (1u << ControlType::CT_DOWN);
+    else
+        this->cs.curStates &= ~(1u << ControlType::CT_DOWN);
+    return 0;
+}
+
+int Device::GamePad::left(bool press){
+    if(press)
+        this->cs.curStates |= (1u << ControlType::CT_LEFT);
+    else
+        this->cs.curStates &= ~(1u << ControlType::CT_LEFT);
+    return 0;
+}
+
+int Device::GamePad::right(bool press){
+    if(press)
+        this->cs.curStates |= (1u << ControlType::CT_RIGHT);
+    else
+        this->cs.curStates &= ~(1u << ControlType::CT_RIGHT);
+    return 0;
+}
+
+int Device::GamePad::a(bool press){
+    if(press)
+        this->cs.curStates |= (1u << ControlType::CT_A);
+    else
+        this->cs.curStates &= ~(1u << ControlType::CT_A);
+    return 0;
+}
+
+int Device::GamePad::b(bool press){
+    if(press)
+        this->cs.curStates |= (1u << ControlType::CT_B);
+    else
+        this->cs.curStates &= ~(1u << ControlType::CT_B);
+    return 0;
+}
+
+int Device::GamePad::x(bool press){
+    if(press)
+        this->cs.curStates |= (1u << ControlType::CT_X);
+    else
+        this->cs.curStates &= ~(1u << ControlType::CT_X);
+    return 0;
+}
+
+int Device::GamePad::y(bool press){
+    if(press)
+        this->cs.curStates |= (1u << ControlType::CT_Y);
+    else
+        this->cs.curStates &= ~(1u << ControlType::CT_Y);
+    return 0;
+}
+
+int Device::GamePad::start(bool press){
+    if(press)
+        this->cs.curStates |= (1u << ControlType::CT_START);
+    else
+        this->cs.curStates &= ~(1u << ControlType::CT_START);
+    return 0;
+}
+
+int Device::GamePad::back(bool press){
+    if(press)
+        this->cs.curStates |= (1u << ControlType::CT_BACK);
+    else
+        this->cs.curStates &= ~(1u << ControlType::CT_BACK);
+    return 0;
+}
+
+int Device::GamePad::ControlState::detectControlState(){
+    unsigned int diff = this->curStates ^ this->preStates;
+    this->newDown = diff & this->curStates;
+    this->newUp = diff & (~ this->curStates);
+
+    if((newDown | newUp) == 0)
+        return 0;
+
+
+    if(((newDown) >> (ControlType::CT_UP)&1u))
+         upEvent(true);
+    if(((newDown) >> (ControlType::CT_DOWN)&1u))
+        downEvent(true);
+    if(((newDown) >> (ControlType::CT_LEFT)&1u))
+        leftEvent(true);
+    if(((newDown) >> (ControlType::CT_RIGHT)&1u))
+        rightEvent(true);
+    if(((newDown) >> (ControlType::CT_A)&1u))
+        aEvent(true);
+    if(((newDown) >> (ControlType::CT_B)&1u))
+        bEvent(true);
+    if(((newDown) >> (ControlType::CT_X)&1u))
+        xEvent(true);
+    if(((newDown) >> (ControlType::CT_Y)&1u))
+        yEvent(true);
+    if(((newDown) >> (ControlType::CT_START)&1u))
+        startEvent(true);
+    if(((newDown) >> (ControlType::CT_BACK)&1u))
+        backEvent(true);
+
+
+    if(((newUp) >> (ControlType::CT_UP)&1u))
+        upEvent(false);
+    if(((newUp) >> (ControlType::CT_DOWN)&1u))
+        downEvent(false);
+    if(((newUp) >> (ControlType::CT_LEFT)&1u))
+        leftEvent(false);
+    if(((newUp) >> (ControlType::CT_RIGHT)&1u))
+        rightEvent(false);
+    if(((newUp) >> (ControlType::CT_A)&1u))
+        aEvent(false);
+    if(((newUp) >> (ControlType::CT_B)&1u))
+        bEvent(false);
+    if(((newUp) >> (ControlType::CT_X)&1u))
+        xEvent(false);
+    if(((newUp) >> (ControlType::CT_Y)&1u))
+        yEvent(false);
+    if(((newUp) >> (ControlType::CT_START)&1u))
+        startEvent(false);
+    if(((newUp) >> (ControlType::CT_BACK)&1u))
+        backEvent(false);
+
+    return 0;
+}
+
+int Device::GamePad::ControlState::upEvent(bool press){
+    worldData->bomber->upEvent(press);
+    return 0;
+}
+
+int Device::GamePad::ControlState::downEvent(bool press){
+    worldData->bomber->downEvent(press);
+    return 0;
+}
+
+int Device::GamePad::ControlState::leftEvent(bool press){
+    worldData->bomber->leftEvent(press);
+    return 0;
+}
+
+int Device::GamePad::ControlState::rightEvent(bool press){
+    worldData->bomber->rightEvent(press);
+    return 0;
+}
+
+int Device::GamePad::ControlState::aEvent(bool press){
+    return 0;
+}
+
+int Device::GamePad::ControlState::bEvent(bool press){
+    return 0;
+}
+
+int Device::GamePad::ControlState::xEvent(bool press){
+    return 0;
+}
+
+int Device::GamePad::ControlState::yEvent(bool press){
+    return 0;
+}
+
+int Device::GamePad::ControlState::startEvent(bool press){
+    return 0;
+}
+int Device::GamePad::ControlState::backEvent(bool press){
+    return 0;
+}
+
 Device::Device() {
 
 };
@@ -94,7 +274,7 @@ void Device::error_callback(int error, const char *description) {
 
 }
 
-static bool GUIMode = false;
+extern bool GUIMode;
 static double mouseX = 0;
 static double mouseY = 0;
 
@@ -163,6 +343,19 @@ void Device::processInput() {
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         worldData->camera.ProcessKeyboard(RIGHT, worldData->deltaTime);
 
+
+    worldData->d->gp.up(glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS);
+    worldData->d->gp.down(glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS);
+    worldData->d->gp.left(glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS);
+    worldData->d->gp.right(glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS);
+    worldData->d->gp.a(glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS);
+    worldData->d->gp.b(glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS);
+    worldData->d->gp.x(glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS);
+    worldData->d->gp.y(glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS);
+    worldData->d->gp.start(glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS);
+    worldData->d->gp.back(glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS);
+
+
 }
 
 void Device::mouse_move_callback(GLFWwindow *window, double xpos, double ypos) {
@@ -221,6 +414,7 @@ void Device::swapBuffers() {
 
 void Device::pollEvents() {
     glfwPollEvents();
+    this->gp.cs.detectControlState();
 }
 
 void Device::shutDown() {

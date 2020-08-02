@@ -34,7 +34,7 @@ public:
 
     void draw();
 
-    [[maybe_unused]] [[nodiscard]] unsigned int numBones() const {
+    [[nodiscard]] unsigned int numBones() const {
         return _numBones;
     }
 

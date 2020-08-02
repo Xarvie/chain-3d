@@ -116,7 +116,7 @@ int Particle::init()
 
 int Particle::draw()
 {
-    glActiveTexture(GL_TEXTURE0);
+
     //computeMatricesFromInputs();
     //glm::mat4 ProjectionMatrix = getProjectionMatrix();
     glBindVertexArray(vertexArrayID);
@@ -226,6 +226,7 @@ int Particle::draw()
 
 
     glEnable(GL_BLEND);
+
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     particleShader->use();

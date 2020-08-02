@@ -144,7 +144,7 @@ target_include_directories(IMGUI
 set(LIBS ${LIBS} IMGUI)
 
 ADD_EXECUTABLE(${CMAKE_PROJECT_NAME}
-    ${CODEFILES})
+    ${CODEFILES} code/vec3r.h)
 target_include_directories(${CMAKE_PROJECT_NAME}
         PUBLIC ${INCLUDEDIRS})
 

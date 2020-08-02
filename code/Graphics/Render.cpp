@@ -10,7 +10,9 @@
 #include "Config.h"
 #include "Model.h"
 #include "Data.h"
-
+#include "Terrain.h"
+#include "map.h"
+bool GUIMode = false;
 std::vector<Shader *> Render::shader = std::vector<Shader *>(SHADER_LOGIC_TYPE::END, nullptr);
 unsigned int Render::depthMapFBO = 0;
 unsigned int Render::depthMap = 0;
@@ -23,6 +25,138 @@ float exposure = 1.0f;
 
 unsigned int quadVAO = 0;
 unsigned int quadVBO;
+
+int Render::render2DInit()
+{
+    auto & ourShader = *shader[SHADER_LOGIC_TYPE::SHADER_LOGIC_TYPE_2D];
+
+    // set up vertex data (and buffer(s)) and configure vertex attributes
+    // ------------------------------------------------------------------
+    float vertices[] = {
+            // positions          // colors           // texture coords
+            0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f, // top right
+            0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f, // bottom right
+            -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f, // bottom left
+            -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f  // top left
+    };
+    unsigned int indices[] = {
+            0, 1, 3, // first triangle
+            1, 2, 3  // second triangle
+    };
+
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+    glGenBuffers(1, &EBO);
+
+    glBindVertexArray(VAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+    // position attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+    // color attribute
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+    
+    // texture coord attribute
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
+
+
+    // load and create a texture
+    // -------------------------
+
+    // texture 1
+    // ---------
+    glGenTextures(1, &texture1);
+    glBindTexture(GL_TEXTURE_2D, texture1);
+    // set the texture wrapping parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    // set texture filtering parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    // load image, create texture and generate mipmaps
+    int width, height, nrChannels;
+    stbi_set_flip_vertically_on_load(true); // tell stb_image.h to flip loaded texture's on the y-axis.
+    // The FileSystem::getPath(...) is part of the GitHub repository so we can find files on any IDE/platform; replace it with your own image path.
+    unsigned char *data = stbi_load(RES_DIR"boom.png", &width, &height, &nrChannels, 0);
+    if (data)
+    {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
+    else
+    {
+        std::cout << "Failed to load texture" << std::endl;
+    }
+    stbi_image_free(data);
+//    // texture 2
+//    // ---------
+//    glGenTextures(1, &texture2);
+//    glBindTexture(GL_TEXTURE_2D, texture2);
+//    // set the texture wrapping parameters
+//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
+//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+//    // set texture filtering parameters
+//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+//    // load image, create texture and generate mipmaps
+//    data = stbi_load(RES_DIR"texture_t1.png", &width, &height, &nrChannels, 0);
+//    if (data)
+//    {
+//        // note that the awesomeface.png has transparency and thus an alpha channel, so make sure to tell OpenGL the data type is of GL_RGBA
+//        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+//        glGenerateMipmap(GL_TEXTURE_2D);
+//    }
+//    else
+//    {
+//        std::cout << "Failed to load texture" << std::endl;
+//    }
+//    stbi_image_free(data);
+
+    // tell opengl for each sampler to which texture unit it belongs to (only has to be done once)
+    // -------------------------------------------------------------------------------------------
+    ourShader.use(); // don't forget to activate/use the shader before setting uniforms!
+    // either set it manually like so:
+    glUniform1i(glGetUniformLocation(ourShader.ID, "texture1"), 0);
+    // or set it via the texture class
+    //ourShader.setInt("texture2", 1);
+    return 0;
+}
+
+int Render::render2dDraw()
+{
+   // glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    //glClear(GL_COLOR_BUFFER_BIT);
+
+    auto & ourShader = *shader[SHADER_LOGIC_TYPE::SHADER_LOGIC_TYPE_2D];
+
+    // bind textures on corresponding texture units
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texture1);
+//    glActiveTexture(GL_TEXTURE1);
+//    glBindTexture(GL_TEXTURE_2D, texture2);
+
+    // render container
+    ourShader.use();
+    int maxCount = 4;
+
+    ourShader.setInt("offset", int(worldData->currentFrame*10) % maxCount + 4);
+    ourShader.setInt("wcount", 4);
+    ourShader.setInt("hcount", 4);
+    //ourShader.setInt("allcount", 30);
+
+
+    glBindVertexArray(VAO);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    return 0;
+}
 
 void renderQuad() {
     if (quadVAO == 0) {
@@ -87,10 +221,11 @@ int Render::init() {
                                                                        SHADER_DIR"blur.frag.glsl");
     }
     if (shader[SHADER_LOGIC_TYPE::SHADER_LOGIC_TYPE_BLOOM_FINAL] == nullptr) {
-        shader[SHADER_LOGIC_TYPE::SHADER_LOGIC_TYPE_BLOOM_FINAL] = new Shader(SHADER_DIR"bloomFinal.vert.glsl",
-                                                                              SHADER_DIR"bloomFinal.frag.glsl");
+        shader[SHADER_LOGIC_TYPE::SHADER_LOGIC_TYPE_BLOOM_FINAL] = new Shader(SHADER_DIR"bloomFinal.vert.glsl",SHADER_DIR"bloomFinal.frag.glsl");
     }
-
+    if (shader[SHADER_LOGIC_TYPE::SHADER_LOGIC_TYPE_2D] == nullptr) {
+        shader[SHADER_LOGIC_TYPE::SHADER_LOGIC_TYPE_2D] = new Shader(SHADER_DIR"2D.vert.glsl",SHADER_DIR"2D.frag.glsl");
+    }
     glGenFramebuffers(1, &hdrFBO);
     glBindFramebuffer(GL_FRAMEBUFFER, hdrFBO);
 
@@ -162,26 +297,25 @@ int Render::init() {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     }
+    std::vector<std::string> resName(3+1);
+    resName[0] = RES_DIR"";
+    resName[1] = RES_DIR"gas.dae";
+    resName[2] = RES_DIR"tree.dae";
+    resName[3] = RES_DIR"girl.dae";
+    staticModels.resize(3+1);
+    animModels.resize(3+1);
+    for(int i = 1; i < 3+1; i++)
     {
         auto x = new Model();
         //int anim = x->load(RES_DIR"untitled.gltf");
-        int anim = x->load(RES_DIR"girl1.dae");
+        int anim = x->load(resName[i]);
         if (anim)
-            animModels.emplace_back(x);
+            animModels[i] = x;
         else
-            staticModels.emplace_back(x);
+            staticModels[i] = x;
     }
-
-    {
-        auto x = new Model();
-        //int anim = x->load(RES_DIR"man1.dae");
-        int anim = x->load(RES_DIR"man1.dae");
-        if (anim)
-            animModels.emplace_back(x);
-        else
-            staticModels.emplace_back(x);
-    }
-
+    t = new World;
+    t->renderInit();
 
 
 #ifdef USE_GUI
@@ -211,7 +345,11 @@ int Render::draw() {
     lightSpaceMatrix = lightProjection * lightView;
 
     if (worldData->shadowOn) {
+        //glEnable(GL_POLYGON_OFFSET_FILL);
+        //glPolygonOffset(worldData->offset1, worldData->offset2);
         getDepthMap();
+        //glDisable(GL_POLYGON_OFFSET_FILL);
+
     }
     {
         glBindFramebuffer(GL_FRAMEBUFFER, hdrFBO);
@@ -225,12 +363,11 @@ int Render::draw() {
         glm::mat4 projection = worldData->proj;
         glm::mat4 view = worldData->camera.getViewMatrix();
         glm::mat4 model = glm::mat4(1.0f);
-        glm::vec3 lightPos = glm::vec3(3 * cos(currentFrame), 3, 3 * sin(currentFrame));
-
+        worldData->light2Pos = glm::vec3(6 * cos(currentFrame), 3, 6 * sin(currentFrame));
 
         {
             //curShader->setVec3("viewPos", worldData->camera.Position);
-            curShader->setVec3("lightPos", lightPos);
+            curShader->setVec3("lightPos", worldData->light2Pos);
             curShader->setInt("shadowMap", 0);
             curShader->setInt("diffuseTexture", 1);
             if (worldData->shadowOn)
@@ -244,11 +381,16 @@ int Render::draw() {
 
         drawModelWithShadow();
 
+
+
+
+
+        t->drawModels(0);
+
+        this->render2dDraw();
         if (worldData->particleOn) {
             p->draw();
         }
-
-
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -288,12 +430,14 @@ int Render::draw() {
         shader[SHADER_LOGIC_TYPE_BLOOM_FINAL]->setFloat("exposure", exposure);
         renderQuad();
     }
-
+//    //shadow debug
+//    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+//    showDepthMap();
 
 #ifdef USE_GUI
     g->render();
 #endif
-    //showDepthMap();
+
 
     return 0;
 }
@@ -312,10 +456,12 @@ void Render::showDepthMap() {
 
 int Render::shaderSetParam(Shader *curShader, DRAW_TYPE type) {
     float &currentFrame = worldData->currentFrame;
-    glm::vec3 lightPos = glm::vec3(3 * cos(currentFrame), 3, 3 * sin(currentFrame));
+
+    worldData->light2Pos =  glm::vec3(6 * cos(currentFrame), 3, 6 * sin(currentFrame));
+
     if (type == DRAW_TYPE::DRAW_TYPE_ANIM_MODEL_WITH_SHADOW || type == DRAW_TYPE::DRAW_TYPE_ANIM_MODEL) {
         //curShader->setVec3("viewPos", worldData->camera.Position);
-        curShader->setVec3("lightPos", lightPos);
+        curShader->setVec3("lightPos", worldData->light2Pos);
         curShader->setInt("shadowMap", 0);
         curShader->setInt("diffuseTexture", 1);
         if (type == DRAW_TYPE::DRAW_TYPE_ANIM_MODEL_WITH_SHADOW)
@@ -350,28 +496,56 @@ int Render::drawModels(DRAW_TYPE type) {
     shaderSetParam(curShader, type);
 
 
-    model = glm::mat4(1.0f);
-    model = scale(model, glm::vec3(10.0f));
-    model = translate(model, glm::vec3(0, 0.0, 0));
-    model = rotate(model, glm::radians(-90.0f), glm::vec3(1, 0, 0));
 
-    staticModels[0]->draw(type, 1, curShader, model, view, projection, currentFrame);
+    for(auto & E : worldData->map1.data)
+    {
+        model = glm::mat4(1.0f);
 
-    model = glm::mat4(1.0f);
-    model = scale(model, glm::vec3(0.3f));
-    model = translate(model, glm::vec3(0, -1 * 0.6666, 0));
-    model = rotate(model, glm::radians(-90.0f), glm::vec3(1, 0, 0));
-    animModels[0]->draw(type, 1, curShader, model, view, projection, currentFrame);
-    auto srcModel = model;
+        int modelID = E.second->modelID;
+        float x = Real::ToFloat(E.second->pos.x);
+        float y = Real::ToFloat(E.second->pos.y);
+        float z = Real::ToFloat(E.second->pos.z);
 
-    int halfDist = 10;
 
-    for (int x = -halfDist; x < halfDist; x++) {
-        for (int y = -halfDist; y < halfDist; y++) {
-            model = translate(srcModel, glm::vec3(x * 8, y * 8, 0));
-            animModels[0]->draw(type, 1, curShader, model, view, projection, currentFrame);
+
+
+        if(modelID == 3){
+            model = glm::mat4(1.0f);
+            //model = scale(model, glm::vec3(0.5f));
+            model = translate(model, glm::vec3(x, 1.0f, y));
+            //model = rotate(model, glm::radians(-90.0f), glm::vec3(1, 0, 0));
+            animModels[modelID]->draw(type, 1, curShader, model, view, projection, currentFrame);
+        }
+        else{
+            model = translate(model, glm::vec3(x, 1.0f, y));
+            //model = rotate(model, glm::radians(-90.0f), glm::vec3(1, 0, 0));
+            model = scale(model, glm::vec3(0.8f));
+            staticModels[modelID]->draw(type, 1, curShader, model, view, projection, currentFrame);
         }
     }
+//    for(int x = 0; x < 15; x++)
+//        for(int y = 0; y < 15; y++)
+//        {
+//            if(map1[x][y] == 2)
+//            {
+//
+//            }
+//        }
+
+
+
+
+
+//    auto srcModel = model;
+//
+//    int halfDist = 2;
+//
+//    for (int x = -halfDist; x < halfDist; x++) {
+//        for (int y = -halfDist; y < halfDist; y++) {
+//            model = translate(srcModel, glm::vec3(x * 8, y * 8, 0));
+//            animModels[0]->draw(type, 1, curShader, model, view, projection, currentFrame);
+//        }
+//    }
 
 
     return 0;
@@ -385,6 +559,7 @@ void Render::getDepthMap() {
 
     glClear(GL_DEPTH_BUFFER_BIT);
     drawModels(DRAW_TYPE::DRAW_TYPE_DEPTH);
+    t->drawModels(1);
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 

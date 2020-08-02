@@ -14,7 +14,8 @@ enum {
 };
 
 void SkeletalMesh::VertexBoneData::addBoneData(unsigned int BoneID, float Weight) {
-    for (unsigned int i = 0; i < NUM_BONES_PER_VERTEX; i++) {
+    unsigned int i = 0;
+    for (; i < NUM_BONES_PER_VERTEX; i++) {
         if (_weights[i] == 0.0) {
             _ids[i] = BoneID;
             _weights[i] = Weight;

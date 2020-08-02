@@ -3,6 +3,7 @@
 #include <iostream>
 #include <chrono>
 #include <thread>
+#include "Collision.h"
 
 int main() {
     worldData = new WorldData();
@@ -13,6 +14,7 @@ int main() {
     d.VSYNC(worldData->vsync);
     Render r;
     r.init();
+    r.render2DInit();
 
 
 
@@ -24,6 +26,7 @@ int main() {
         worldData->updateTime(d.getTime());
 
         r.draw();
+
 
 
 

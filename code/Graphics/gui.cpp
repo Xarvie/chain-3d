@@ -63,6 +63,9 @@ int gui::render(){
         ImGui::DragFloat("##lookCenterPos.x", &worldData->lookCenterPos.x, 1.0);
         ImGui::DragFloat("##lookCenterPos.y", &worldData->lookCenterPos.y, 1.0);
         ImGui::DragFloat("##lookCenterPos.z", &worldData->lookCenterPos.z, 1.0);
+        ImGui::Text("polyoffset");
+        ImGui::DragFloat("##polyoffset.x", &worldData->offset1, 1.0);
+        ImGui::DragFloat("##polyoffset.y", &worldData->offset2, 1.0);
         ImGui::Text("light1offset");
         ImGui::DragFloat("##light1offset.x", &worldData->light1Offset.x, 1.0);
         ImGui::DragFloat("##light1offset.y", &worldData->light1Offset.y, 1.0);
