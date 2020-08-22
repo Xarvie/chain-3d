@@ -212,7 +212,7 @@ ELSE()
     IF(USE_GCC)
 
         set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
-        set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O3")
+        set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
         target_link_libraries(${CMAKE_PROJECT_NAME}
                 pthread
                 ${LIBS}

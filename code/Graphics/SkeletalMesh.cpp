@@ -210,9 +210,11 @@ Texture SkeletalMesh::loadMaterialFile(const aiMaterial *pMaterial, aiTextureTyp
     pMaterial->GetTexture(aiType, 0, &Path);
     std::string p(Path.data);
 
+
     if (p.substr(0, 2) == ".\\") {
         p = p.substr(2, p.size() - 2);
     }
+    std::replace(p.begin(),p.end(), '\\' , '/');
     std::string FullPath = _dir + "/" + p;
 
     for (auto i: _textures_Loaded) {

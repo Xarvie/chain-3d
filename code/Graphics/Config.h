@@ -7,7 +7,7 @@
 #define INC_3D_CONFIG_H
 
 #ifdef __APPLE__
-#define PROJECT_ROOT_DIR "../"
+#define PROJECT_ROOT_DIR "/Users/xarvie/Desktop/chain-3d/"
 #define RES_DIR PROJECT_ROOT_DIR"resources/"
 #define SHADER_DIR PROJECT_ROOT_DIR"code/Graphics/shader/"
 #elif __WIN32
