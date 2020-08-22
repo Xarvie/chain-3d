@@ -17,6 +17,7 @@
 
 #include "Collision.h"
 #include "map.h"
+#include "BatchSpriteScene.h"
 
 class Data {
 
@@ -28,6 +29,11 @@ public:
         init();
     }
 
+    Renderer *pRenderer;
+    GraphicsContext* pGraphicsContext;
+    BatchSpriteScene * pCurrentTestScene;
+
+    Painter *pPainter;
     void init();
 
     void updateTime(float curTime) {
@@ -83,7 +89,7 @@ public:
     float offset1 = 0.4;
     float offset2 = 1.0;
     int bloomOn = 1;
-    int particleOn = 1;
+    int particleOn = 0;
     glm::mat4 proj;
 
     bool vsync = true;

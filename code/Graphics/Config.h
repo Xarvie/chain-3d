@@ -11,8 +11,8 @@
 #define RES_DIR PROJECT_ROOT_DIR"resources/"
 #define SHADER_DIR PROJECT_ROOT_DIR"code/Graphics/shader/"
 #elif __WIN32
-//#define PROJECT_ROOT_DIR "C:/Users/caspasex/Desktop/chain-3d/"
-#define PROJECT_ROOT_DIR "../"
+#define PROJECT_ROOT_DIR "D:/code/chain-3d/"
+//#define PROJECT_ROOT_DIR "../"
 #define RES_DIR PROJECT_ROOT_DIR"resources/"
 #define SHADER_DIR PROJECT_ROOT_DIR"code/Graphics/shader/"
 #endif

@@ -5,6 +5,7 @@
 #ifndef INC_3D_VEC3R_H
 #define INC_3D_VEC3R_H
 #include "real.h"
+#include "glm/glm.hpp"
 
 class vec3r
 {
@@ -23,6 +24,14 @@ public:
         this->y = y;
         this->z = z;
     }
+    vec3r operator-(const vec3r & v){
+        return vec3r(this->x - v.x, this->y - v.y, this->z - v.z);
+    }
+
+    glm::vec3 glm(){
+        return glm::vec3(Real::ToFloat(this->x), Real::ToFloat(this->y), Real::ToFloat(this->z));
+    }
+
 
 //    vec3r(float x, float y, float z){
 //        this->x = Real::FromFloat(x);

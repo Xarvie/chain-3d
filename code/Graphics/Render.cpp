@@ -24,7 +24,9 @@ float exposure = 1.0f;
 
 
 unsigned int quadVAO = 0;
-unsigned int quadVBO;
+unsigned int quadVBO = 0;
+
+
 
 int Render::render2DInit()
 {
@@ -62,7 +64,7 @@ int Render::render2DInit()
     // color attribute
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
-    
+
     // texture coord attribute
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
     glEnableVertexAttribArray(2);
@@ -70,55 +72,36 @@ int Render::render2DInit()
 
     // load and create a texture
     // -------------------------
+    textures.resize(resType.size());
+    for(int i = 0; i < resType.size(); i++){
+        glGenTextures(1, &textures[i]);
+        glBindTexture(GL_TEXTURE_2D, textures[i]);
+        // set the texture wrapping parameters
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        // set texture filtering parameters
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        // load image, create texture and generate mipmaps
+        int width, height, nrChannels;
+        stbi_set_flip_vertically_on_load(true); // tell stb_image.h to flip loaded texture's on the y-axis.
+        // The FileSystem::getPath(...) is part of the GitHub repository so we can find files on any IDE/platform; replace it with your own image path.
+        unsigned char *data = stbi_load(resType[i].modelName, &width, &height, &nrChannels, 0);
+        if (data)
+        {
+            resType[i].pixelX = width;
+            resType[i].pixelY = height;
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+            glGenerateMipmap(GL_TEXTURE_2D);
+        }
+        else
+        {
+            std::cout << "Failed to load texture" << std::endl;
+        }
+        stbi_image_free(data);
 
-    // texture 1
-    // ---------
-    glGenTextures(1, &texture1);
-    glBindTexture(GL_TEXTURE_2D, texture1);
-    // set the texture wrapping parameters
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    // set texture filtering parameters
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    // load image, create texture and generate mipmaps
-    int width, height, nrChannels;
-    stbi_set_flip_vertically_on_load(true); // tell stb_image.h to flip loaded texture's on the y-axis.
-    // The FileSystem::getPath(...) is part of the GitHub repository so we can find files on any IDE/platform; replace it with your own image path.
-    unsigned char *data = stbi_load(RES_DIR"boom.png", &width, &height, &nrChannels, 0);
-    if (data)
-    {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
     }
-    else
-    {
-        std::cout << "Failed to load texture" << std::endl;
-    }
-    stbi_image_free(data);
-//    // texture 2
-//    // ---------
-//    glGenTextures(1, &texture2);
-//    glBindTexture(GL_TEXTURE_2D, texture2);
-//    // set the texture wrapping parameters
-//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
-//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-//    // set texture filtering parameters
-//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-//    // load image, create texture and generate mipmaps
-//    data = stbi_load(RES_DIR"texture_t1.png", &width, &height, &nrChannels, 0);
-//    if (data)
-//    {
-//        // note that the awesomeface.png has transparency and thus an alpha channel, so make sure to tell OpenGL the data type is of GL_RGBA
-//        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-//        glGenerateMipmap(GL_TEXTURE_2D);
-//    }
-//    else
-//    {
-//        std::cout << "Failed to load texture" << std::endl;
-//    }
-//    stbi_image_free(data);
+
 
     // tell opengl for each sampler to which texture unit it belongs to (only has to be done once)
     // -------------------------------------------------------------------------------------------
@@ -135,26 +118,84 @@ int Render::render2dDraw()
    // glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     //glClear(GL_COLOR_BUFFER_BIT);
 
-    auto & ourShader = *shader[SHADER_LOGIC_TYPE::SHADER_LOGIC_TYPE_2D];
 
-    // bind textures on corresponding texture units
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, texture1);
-//    glActiveTexture(GL_TEXTURE1);
-//    glBindTexture(GL_TEXTURE_2D, texture2);
+    std::map<float, UnitData*> sorted;
+    for (auto& E: map1Unit)
+    {
+        auto pos = glm::vec3(Real::ToFloat(E.pos.x), Real::ToFloat(E.pos.y), Real::ToFloat(E.pos.z));
+        float distance = glm::length(worldData->camera.Position - pos);
+        sorted[distance] = &E;
+    }
+
+
+    auto & ourShader = *shader[SHADER_LOGIC_TYPE::SHADER_LOGIC_TYPE_2D];
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+
+
 
     // render container
     ourShader.use();
-    int maxCount = 4;
 
-    ourShader.setInt("offset", int(worldData->currentFrame*10) % maxCount + 4);
-    ourShader.setInt("wcount", 4);
-    ourShader.setInt("hcount", 4);
-    //ourShader.setInt("allcount", 30);
+    glm::mat4 projection = worldData->proj;
+    glm::mat4 view = worldData->camera.getViewMatrix();
+
+    for(std::map<float, UnitData*>::reverse_iterator it = sorted.rbegin(); it != sorted.rend(); ++it)
+    {
+        auto & rest = resType[it->second->type];
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, textures[rest.modelTypeId]);
+        if(rest.animAll > 1){
+            glm::mat4 model = glm::mat4(1.0f);
+            model = translate(model, rest.ModelOffset + it->second->pos.glm());
+            model = glm::scale(model,glm::vec3(rest.pixelX*0.01f, rest.pixelX*0.01f, rest.pixelX*0.01f));
+            ourShader.setMat4("MVP", projection * view * model);
+            int w = rest.animW, h = rest.animH;
+            ourShader.setInt("offset", int(worldData->currentFrame*10) % w + w*3);
+            ourShader.setInt("wcount", w);
+            ourShader.setInt("hcount", h);
+            //ourShader.setInt("allcount", 30);
+
+            //glDisable(GL_DEPTH_TEST);
+            glBindVertexArray(VAO);
+            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        }
+        else
+        {
+            glm::mat4 model = glm::mat4(1.0f);
+            model = translate(model, rest.ModelOffset + it->second->pos.glm());
+            model = glm::scale(model,glm::vec3(rest.pixelX*0.01f, rest.pixelX*0.01f, rest.pixelX*0.01f));
+            ourShader.setMat4("MVP", projection * view * model);
+            ourShader.setInt("offset", 0);
+            ourShader.setInt("wcount", 1);
+            ourShader.setInt("hcount", 1);
+            //ourShader.setInt("allcount", 30);
+
+            //glDisable(GL_DEPTH_TEST);
+            glBindVertexArray(VAO);
+            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+        }
 
 
-    glBindVertexArray(VAO);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+    }
+
+
+
+//    model = translate(model, glm::vec3(0.1, 0.0f, -1));
+//    //model = glm::scale(model,glm::vec3(1.0, 2.0f, 1.0));
+//    ourShader.setMat4("MVP", projection * view * model);
+//    ourShader.setInt("offset", int(worldData->currentFrame*10) % maxCount + 4);
+//    ourShader.setInt("wcount", 4);
+//    ourShader.setInt("hcount", 4);
+//    //ourShader.setInt("allcount", 30);
+//
+//    //glDisable(GL_DEPTH_TEST);
+//    glBindVertexArray(VAO);
+//    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+//    //glEnable(GL_DEPTH_TEST);
     return 0;
 }
 
@@ -183,6 +224,7 @@ void renderQuad() {
     glBindVertexArray(0);
 }
 
+#include "BatchSpriteScene.h"
 
 int Render::init() {
 
@@ -196,9 +238,11 @@ int Render::init() {
     if (p == nullptr)
         p = new Particle;
     p->init();
-    worldData->proj = glm::perspective(worldData->camera.Zoom,
+    worldData->proj = glm::perspective(45.0f,
                                        float(worldData->w) / float(worldData->h),
                                        0.1f, 50.0f);
+
+    //worldData->proj = glm::ortho(0.0f, 50.0f, 0.0f, 50.0f, -100.0f, 100.0f);
 
     if (shader[SHADER_LOGIC_TYPE::SHADER_LOGIC_TYPE_ANIM_MODEL_WITH_SHADOW] == nullptr) {
         shader[SHADER_LOGIC_TYPE::SHADER_LOGIC_TYPE_ANIM_MODEL_WITH_SHADOW] = new Shader(
@@ -225,6 +269,9 @@ int Render::init() {
     }
     if (shader[SHADER_LOGIC_TYPE::SHADER_LOGIC_TYPE_2D] == nullptr) {
         shader[SHADER_LOGIC_TYPE::SHADER_LOGIC_TYPE_2D] = new Shader(SHADER_DIR"2D.vert.glsl",SHADER_DIR"2D.frag.glsl");
+    }
+    if (shader[SHADER_LOGIC_TYPE::SHADER_LOGIC_TYPE_2D2] == nullptr) {
+        shader[SHADER_LOGIC_TYPE::SHADER_LOGIC_TYPE_2D2] = new Shader(SHADER_DIR"shader.vert.glsl",SHADER_DIR"shader.frag.glsl");
     }
     glGenFramebuffers(1, &hdrFBO);
     glBindFramebuffer(GL_FRAMEBUFFER, hdrFBO);
@@ -324,6 +371,8 @@ int Render::init() {
     g->init((GLFWwindow*)worldData->d->_window->_glfwPtr);
 #endif
 
+
+
     return 0;
 }
 
@@ -387,10 +436,11 @@ int Render::draw() {
 
         t->drawModels(0);
 
-        this->render2dDraw();
+
         if (worldData->particleOn) {
             p->draw();
         }
+       this->render2dDraw();
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -474,7 +524,6 @@ int Render::shaderSetParam(Shader *curShader, DRAW_TYPE type) {
     return 0;
 }
 
-
 int Render::drawModels(DRAW_TYPE type) {
     float &currentFrame = worldData->currentFrame;
     Shader *curShader = nullptr;
@@ -506,22 +555,23 @@ int Render::drawModels(DRAW_TYPE type) {
         float y = Real::ToFloat(E.second->pos.y);
         float z = Real::ToFloat(E.second->pos.z);
 
-
-
-
-        if(modelID == 3){
+        if(E.second->anim)
+        {
             model = glm::mat4(1.0f);
             //model = scale(model, glm::vec3(0.5f));
             model = translate(model, glm::vec3(x, 1.0f, y));
             //model = rotate(model, glm::radians(-90.0f), glm::vec3(1, 0, 0));
             animModels[modelID]->draw(type, 1, curShader, model, view, projection, currentFrame);
         }
-        else{
+        else
+        {
             model = translate(model, glm::vec3(x, 1.0f, y));
             //model = rotate(model, glm::radians(-90.0f), glm::vec3(1, 0, 0));
             model = scale(model, glm::vec3(0.8f));
             staticModels[modelID]->draw(type, 1, curShader, model, view, projection, currentFrame);
         }
+
+
     }
 //    for(int x = 0; x < 15; x++)
 //        for(int y = 0; y < 15; y++)

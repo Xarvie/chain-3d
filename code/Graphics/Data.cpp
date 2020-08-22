@@ -66,6 +66,10 @@ void WorldData::init() {
             u->pos.y = Real::FromInt(y);
             u->pos.z = Real::FromInt(z);
             u->modelID = type;
+            if(type == 3)
+            {
+                u->anim = 1;
+            }
             u->moveObj.pos = &u->pos;
             map1.add(u);
             real half = Real::Div(Real::FromInt(40), Real::FromInt(100));

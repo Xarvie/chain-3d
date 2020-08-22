@@ -44,16 +44,16 @@ int World::drawModels(int depth){
             glActiveTexture(GL_TEXTURE0+1);
             glBindTexture(GL_TEXTURE_2D, texture_a);
             glActiveTexture(GL_TEXTURE1+1);
-            glBindTexture(GL_TEXTURE_2D, texture_d);
-            glActiveTexture(GL_TEXTURE2+1);
             glBindTexture(GL_TEXTURE_2D, texture_t);
+            glActiveTexture(GL_TEXTURE2+1);
+            glBindTexture(GL_TEXTURE_2D, texture_d);
         } else{
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, texture_a);
             glActiveTexture(GL_TEXTURE1);
-            glBindTexture(GL_TEXTURE_2D, texture_d);
-            glActiveTexture(GL_TEXTURE2);
             glBindTexture(GL_TEXTURE_2D, texture_t);
+            glActiveTexture(GL_TEXTURE2);
+            glBindTexture(GL_TEXTURE_2D, texture_d);
         }
 
 
@@ -116,30 +116,9 @@ int World::renderInit()
         // load image, create texture and generate mipmaps
         int width, height, nrChannels;
         stbi_set_flip_vertically_on_load(true); // tell stb_image.h to flip loaded texture's on the y-axis.
-        unsigned char *data = stbi_load(RES_DIR"/texture_t1.png", &width, &height, &nrChannels, 0);
+        unsigned char *data = stbi_load(RES_DIR"texture_t1.png", &width, &height, &nrChannels, 0);
         if (data) {
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-            //glGenerateMipmap(GL_TEXTURE_2D);
-        } else {
-            std::cout << "Failed to load texture" << std::endl;
-        }
-        stbi_image_free(data);
-    }
-    {
-        glGenTextures(1, &texture_d);
-        glBindTexture(GL_TEXTURE_2D, texture_d);
-        // set the texture wrapping parameters
-        //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        // set texture filtering parameters
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        // load image, create texture and generate mipmaps
-        int width, height, nrChannels;
-        stbi_set_flip_vertically_on_load(true); // tell stb_image.h to flip loaded texture's on the y-axis.
-        unsigned char *data = stbi_load(RES_DIR"/texture_t2.png", &width, &height, &nrChannels, 0);
-        if (data) {
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
             //glGenerateMipmap(GL_TEXTURE_2D);
         } else {
             std::cout << "Failed to load texture" << std::endl;
@@ -158,7 +137,7 @@ int World::renderInit()
         // load image, create texture and generate mipmaps
         int width, height, nrChannels;
         stbi_set_flip_vertically_on_load(true); // tell stb_image.h to flip loaded texture's on the y-axis.
-        unsigned char *data = stbi_load(RES_DIR"/texture_t1.png", &width, &height, &nrChannels, 0);
+        unsigned char *data = stbi_load(RES_DIR"texture_t1.png", &width, &height, &nrChannels, 0);
         if (data) {
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
             //glGenerateMipmap(GL_TEXTURE_2D);
@@ -168,9 +147,34 @@ int World::renderInit()
         stbi_image_free(data);
     }
     stbi_set_flip_vertically_on_load(false);
+
+
+
+    {
+        glGenTextures(1, &texture_d);
+        glBindTexture(GL_TEXTURE_2D, texture_d);
+        // set the texture wrapping parameters
+        //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        // set texture filtering parameters
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        // load image, create texture and generate mipmaps
+        int width, height, nrChannels;
+        stbi_set_flip_vertically_on_load(true); // tell stb_image.h to flip loaded texture's on the y-axis.
+        unsigned char *data = stbi_load(RES_DIR"texture_t1.png", &width, &height, &nrChannels, 0);
+        if (data) {
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+            //glGenerateMipmap(GL_TEXTURE_2D);
+        } else {
+            std::cout << "Failed to load texture" << std::endl;
+        }
+        stbi_image_free(data);
+    }
+
+
+
     glBindTexture(GL_TEXTURE_2D, 0);
-
-
 //    {
 //        int halfLen = 1;
 //        for (int ix = -halfLen; ix <= halfLen; ix++) {

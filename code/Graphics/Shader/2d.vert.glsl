@@ -41,6 +41,7 @@ void main()
 
 
 
-    TexCoord = vec2(mod(index, wcount) * 1.0 / wcount + aTexCoord.x / wcount,
-    (hcount - 1 - index/wcount) * 1.0 / hcount + aTexCoord.y / hcount);
+    TexCoord = vec2(mod(index, wcount) * 1.0 / wcount + aTexCoord.x / wcount - 0.001,
+    (hcount - 1.0 - index/wcount) * 1.0 / hcount + aTexCoord.y / hcount - 0.001);
+
 }

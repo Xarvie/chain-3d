@@ -23,6 +23,7 @@ class Unit {
 public:
     MoveObj moveObj;
 
+    bool anim = 0;
     int modelID = 0;
 
     float transx = 0;

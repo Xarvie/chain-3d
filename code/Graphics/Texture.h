@@ -11,6 +11,7 @@
 #include <glad/glad.h>
 #include <string>
 #include <iostream>
+#include <glm/glm.hpp>
 
 enum TextureEnum {
     DIFFUSE,
@@ -18,6 +19,7 @@ enum TextureEnum {
     NORMAL,
     IMAGE
 };
+
 
 class Texture {
 public:
@@ -41,6 +43,8 @@ public:
     GLuint m_textureID;
     TextureEnum m_textureType;
 
+    GLfloat x, y, w, h;
+    glm::vec2 texcoords[4];
 };
 
 #endif
