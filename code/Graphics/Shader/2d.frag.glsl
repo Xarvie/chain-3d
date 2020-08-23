@@ -23,7 +23,7 @@ uniform sampler2D texture1;
 void main()
 {
     // linearly interpolate between both textures (80% container, 20% awesomeface)
-    FragColor = texture2D(texture1, TexCoord.xy);
+    FragColor = texture(texture1, TexCoord.xy);
 
     //    vec4 color = texture2D(baseTexture, gl_TexCoord[0].xy);
     //    gl_FragColor = color;

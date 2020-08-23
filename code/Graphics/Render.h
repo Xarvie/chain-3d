@@ -150,7 +150,7 @@ public:
 
         shader[SHADER_LOGIC_TYPE_2D2]->use();
         {
-            GL_FRAMEBUFFER, FBO2D[0]);
+            glBindFramebuffer(GL_FRAMEBUFFER, FBO2D[0]);
             glBindTexture(GL_TEXTURE_2D, Buffer2D[0]);
 
 
@@ -237,7 +237,7 @@ public:
 
             glBindVertexArray(0);
 
-            GL_FRAMEBUFFER, 0);
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 
             shader[SHADER_LOGIC_TYPE_DEBUG]->use();
