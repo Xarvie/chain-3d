@@ -36,8 +36,8 @@ int main() {
 
     worldData->lastFrame = d.getTime();
 
-    Texture* t1 = new Texture(GL_TEXTURE_2D, RES_DIR"2d/ter3.png", IMAGE);
-    Texture* t2 = new Texture(GL_TEXTURE_2D, RES_DIR"2d/ter9.png", IMAGE);
+    Texture* t1 = new Texture(GL_TEXTURE_2D, RES_DIR"2d/boom.png", IMAGE);
+    Texture* t2 = new Texture(GL_TEXTURE_2D, RES_DIR"2d/bb.png", IMAGE);
 
     while (d.shouldClose()) {
         d.processInput();
@@ -50,12 +50,12 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT);
         glViewport(0, 0, worldData->w, worldData->h);
         ourShader.use();
-        ::Color c(0, 1, 1, 0.5);
+        ::Color c(1, 1, 1, 1.0f);
 
 
-        r.drawTexture(0, 0, t1, c);
-        r.drawTexture(t1->w/2, t1->h/2, t2, c);
-        r.drawTexture(t1->w/2/2, t1->h/2/2, t2, c);
+        r.drawTexture(0, 0, t1, c, worldData->currentFrame);
+        //r.drawTexture(t1->w/2, t1->h/2, t2, c, worldData->currentFrame);
+        //r.drawTexture(t1->w/2/2, t1->h/2/2, t2, c);
         //r.draw();
 
 //        worldData->pCurrentTestScene->Draw(worldData->pPainter);

@@ -22,6 +22,7 @@ void Texture::load() {
     glGenTextures(1, &m_textureID);
     glBindTexture(m_textureTarget, m_textureID);
     int width, height, nrComponents;
+    stbi_set_flip_vertically_on_load(false);
     unsigned char *data = stbi_load(m_fileName.c_str(), &width, &height, &nrComponents, 0);
     if (data) {
         GLenum internalFormat;

@@ -9,6 +9,6 @@ uniform sampler2D defaultTexture;
 
 void main()
 {
-	Color = texture(defaultTexture, texcoord) * color * color;
+	Color = texture(defaultTexture, texcoord) * color;
 
 }

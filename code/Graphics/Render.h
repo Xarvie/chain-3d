@@ -145,7 +145,7 @@ public:
         return 0;
     }
 
-    void drawTexture(int x, int y, Texture* texture, Color& color)
+    void drawTexture(int x, int y, Texture* texture, Color& color, float curframe)
         {
 
         shader[SHADER_LOGIC_TYPE_2D2]->use();
@@ -165,12 +165,12 @@ public:
             ////this->resizeVector(4, 6);
             ///
             ///
-
-
+            glClear(GL_COLOR_BUFFER_BIT);
+            int animW = 4, animH = 4;
             vPositions[0] = glm::vec3(x + 0, y + 0, 0);
-            vPositions[1] = glm::vec3(x + 0, y + h, 0);
-            vPositions[2] = glm::vec3(x + w, y + h, 0);
-            vPositions[3] = glm::vec3(x + w, y + 0, 0);
+            vPositions[1] = glm::vec3(x + 0, y + h/animH, 0);
+            vPositions[2] = glm::vec3(x + w/animW, y + h/animH, 0);
+            vPositions[3] = glm::vec3(x + w/animW, y + 0, 0);
 
 
 
@@ -222,7 +222,13 @@ public:
             glBindTexture(GL_TEXTURE_2D, texture->m_textureID);
             shader[SHADER_LOGIC_TYPE_2D2]->setInt("defaultTexture", 0);
             //glUniform1i(glGetUniformLocation(shaderProgram, "defaulteTexture"), 0);
+            //shader[SHADER_LOGIC_TYPE_2D2]->setInt("offset", 2);
 
+
+
+            shader[SHADER_LOGIC_TYPE_2D2]->setInt("offset", int(curframe*10) % animW + animW*1);
+            shader[SHADER_LOGIC_TYPE_2D2]->setInt("wcount", animW);
+            shader[SHADER_LOGIC_TYPE_2D2]->setInt("hcount", animH);
             glBindBuffer(GL_ARRAY_BUFFER, 0);
 
             int nIndexCount = 6;
@@ -244,6 +250,7 @@ public:
             shader[SHADER_LOGIC_TYPE_DEBUG]->setInt("depthMap", 0);
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, Buffer2D[0]);
+            //if(int(curframe)%2 == 0)
             renderQuad();
             return ;
         }
