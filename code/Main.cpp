@@ -9,7 +9,7 @@ int main() {
     worldData = new WorldData();
     auto& d = *worldData->d;
     d.init();
-    d.createWindow("ChainProject", 800, 600, 0, 1);
+    d.createWindow("ChainProject", 600, 535, 0, 1);
 
     d.VSYNC(worldData->vsync);
     Render r;
@@ -36,8 +36,8 @@ int main() {
 
     worldData->lastFrame = d.getTime();
 
-    Texture* t1 = new Texture(GL_TEXTURE_2D, RES_DIR"2d/boom.png", IMAGE);
-    Texture* t2 = new Texture(GL_TEXTURE_2D, RES_DIR"2d/bb.png", IMAGE);
+//    Texture* t1 = new Texture(GL_TEXTURE_2D, RES_DIR"2d/boom.png", IMAGE);
+//    Texture* t2 = new Texture(GL_TEXTURE_2D, RES_DIR"2d/bb.png", IMAGE);
 
     while (d.shouldClose()) {
         d.processInput();
@@ -46,14 +46,14 @@ int main() {
         worldData->updateTime(d.getTime());
 //        worldData->pCurrentTestScene->Update(worldData->deltaTime);
         glDisable(GL_DEPTH_TEST);
-        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+        glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
         glViewport(0, 0, worldData->w, worldData->h);
         ourShader.use();
         ::Color c(1, 1, 1, 1.0f);
 
-
-        r.drawTexture(0, 0, t1, c, worldData->currentFrame);
+        r.render2dDraw();
+        //r.drawTexture(0, 0, &t1, c, worldData->currentFrame);
         //r.drawTexture(t1->w/2, t1->h/2, t2, c, worldData->currentFrame);
         //r.drawTexture(t1->w/2/2, t1->h/2/2, t2, c);
         //r.draw();

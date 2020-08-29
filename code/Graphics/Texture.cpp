@@ -49,10 +49,7 @@ void Texture::load() {
         this->w = width;
         this->h = height;
 
-        this->texcoords[0] = glm::vec2(0, 0);
-        this->texcoords[1] = glm::vec2(0, 1);
-        this->texcoords[2] = glm::vec2(1, 1);
-        this->texcoords[3] = glm::vec2(1, 0);
+
 
 
         stbi_image_free(data);

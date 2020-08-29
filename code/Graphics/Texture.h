@@ -44,7 +44,7 @@ public:
     TextureEnum m_textureType;
 
     GLfloat x, y, w, h;
-    glm::vec2 texcoords[4];
+
 };
 
 #endif

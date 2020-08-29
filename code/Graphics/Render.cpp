@@ -72,35 +72,20 @@ int Render::render2DInit()
 
     // load and create a texture
     // -------------------------
-    textures.resize(resType.size());
-    for(int i = 0; i < resType.size(); i++){
-        glGenTextures(1, &textures[i]);
-        glBindTexture(GL_TEXTURE_2D, textures[i]);
-        // set the texture wrapping parameters
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        // set texture filtering parameters
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        // load image, create texture and generate mipmaps
-        int width, height, nrChannels;
-        stbi_set_flip_vertically_on_load(true); // tell stb_image.h to flip loaded texture's on the y-axis.
-        // The FileSystem::getPath(...) is part of the GitHub repository so we can find files on any IDE/platform; replace it with your own image path.
-        unsigned char *data = stbi_load(resType[i].modelName, &width, &height, &nrChannels, 0);
-        if (data)
-        {
-            resType[i].pixelX = width;
-            resType[i].pixelY = height;
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-            glGenerateMipmap(GL_TEXTURE_2D);
-        }
-        else
-        {
-            std::cout << "Failed to load texture" << std::endl;
-        }
-        stbi_image_free(data);
+    for (auto& E: resType)
+    {
+        E.load();
+    }
+    for(int i = 0; i < sizeof(sss) / sizeof(sss[0]); i++)
+    {
+        UnitData x = { vec3r(Real::FromInt( sss[i][0]),    Real::FromInt(sss[i][1])     ,Real::FromInt(sss[i][2])),sss[i][3]};
+        map1tile.push_back(x);
 
     }
+
+
+
+
 
 
     // tell opengl for each sampler to which texture unit it belongs to (only has to be done once)
@@ -113,77 +98,223 @@ int Render::render2DInit()
     return 0;
 }
 
+void Render::drawTexture(float x, float y, Texture* texture, glm::vec2* texcoords, ::Color& color, float curframe, int animW, int animH)
+{
+
+    int w = texture->w;
+    int h = texture->h;
+
+    vPositions.resize(4);
+    vIndices.resize(6);
+    ////this->resizeVector(4, 6);
+    ///
+    ///
+
+
+    vPositions[0] = glm::vec3(x + 0, y + 0, 0);
+    vPositions[1] = glm::vec3(x + 0, y + h/animH, 0);
+    vPositions[2] = glm::vec3(x + w/animW, y + h/animH, 0);
+    vPositions[3] = glm::vec3(x + w/animW, y + 0, 0);
+
+
+
+    glm::mat4 mat(1.0f);
+    glm::mat4 ortho = glm::ortho(0.0f, (float)worldData->w, (float)worldData->h, 0.0f, -1.0f, 1.0f);
+
+    glm::mat4 mTransformMatrix = ortho ;
+
+    vPositions[0] = mTransformMatrix * glm::vec4(vPositions[0],1.0f);
+    vPositions[1] = mTransformMatrix * glm::vec4(vPositions[1],1.0f);
+    vPositions[2] = mTransformMatrix * glm::vec4(vPositions[2],1.0f);
+    vPositions[3] = mTransformMatrix * glm::vec4(vPositions[3],1.0f);
+
+    vIndices[0] = 0;
+    vIndices[1] = 2;
+    vIndices[2] = 1;
+    vIndices[3] = 0;
+    vIndices[4] = 3;
+    vIndices[5] = 2;
+
+
+    vColors.resize(4, color);
+
+
+    static RenderUnit unit;
+    unit.pPositions = &vPositions[0];
+    unit.nPositionCount = 4;
+    unit.pTexcoords = texcoords;
+    unit.pIndices = vIndices.data();
+    unit.nIndexCount = 6;
+    unit.color = color;
+    unit.texture = texture;
+    //unit.renderType = RENDER_TYPE_TEXTURE;
+
+    //pRenderer->pushRenderUnit(unit);
+    int nPositionCount = 4;
+    int xxxx = sizeof( glm::vec3);
+    glBindBuffer(GL_ARRAY_BUFFER, positionBuffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof( glm::vec3 ) * nPositionCount, &vPositions[0], GL_DYNAMIC_DRAW);
+
+    glBindBuffer(GL_ARRAY_BUFFER, colorBuffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof( ::Color ) * nPositionCount, &vColors[0], GL_DYNAMIC_DRAW);
+
+
+    glBindBuffer(GL_ARRAY_BUFFER, texcoordBuffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof( glm::vec2 ) * nPositionCount, &texcoords[0], GL_DYNAMIC_DRAW);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texture->m_textureID);
+    shader[SHADER_LOGIC_TYPE_2D2]->setInt("defaultTexture", 0);
+    //glUniform1i(glGetUniformLocation(shaderProgram, "defaulteTexture"), 0);
+    //shader[SHADER_LOGIC_TYPE_2D2]->setInt("offset", 2);
+
+
+
+    shader[SHADER_LOGIC_TYPE_2D2]->setInt("offset", int(curframe*10) % animW + animW*0);
+    shader[SHADER_LOGIC_TYPE_2D2]->setInt("wcount", animW);
+    shader[SHADER_LOGIC_TYPE_2D2]->setInt("hcount", animH);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    int nIndexCount = 6;
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof( GLuint ) * nIndexCount, &vIndices[0], GL_DYNAMIC_DRAW);
+
+
+    glBindVertexArray(VAO2);
+
+
+    glDrawElements(GL_TRIANGLES, nIndexCount, GL_UNSIGNED_INT, 0);
+
+
+    return ;
+}
+
 int Render::render2dDraw()
 {
    // glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     //glClear(GL_COLOR_BUFFER_BIT);
 
+//
+//    std::map<float, UnitData*> sorted;
+//    for (auto& E: map1Unit)
+//    {
+//        auto pos = glm::vec3(Real::ToFloat(E.pos.x), Real::ToFloat(E.pos.y), Real::ToFloat(E.pos.z));
+//        float distance = glm::length(worldData->camera.Position - pos);
+//        sorted[distance] = &E;
+//    }
+//
+//
+//    auto & ourShader = *shader[SHADER_LOGIC_TYPE::SHADER_LOGIC_TYPE_2D];
+//    glEnable(GL_BLEND);
+//    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+//
+//
+//
+//
+//    // render container
+//    ourShader.use();
+//
+//    glm::mat4 projection = worldData->proj;
+//    glm::mat4 view = worldData->camera.getViewMatrix();
+//
+//    for(std::map<float, UnitData*>::reverse_iterator it = sorted.rbegin(); it != sorted.rend(); ++it)
+//    {
+//        auto & rest = resType[it->second->type];
+//        glActiveTexture(GL_TEXTURE0);
+//        glBindTexture(GL_TEXTURE_2D, textures[rest.modelTypeId]);
+//        if(rest.animAll > 1){
+//            glm::mat4 model = glm::mat4(1.0f);
+//            model = translate(model, rest.ModelOffset + it->second->pos.glm());
+//            model = glm::scale(model,glm::vec3(rest.pixelX*0.01f, rest.pixelX*0.01f, rest.pixelX*0.01f));
+//            ourShader.setMat4("MVP", projection * view * model);
+//            int w = rest.animW, h = rest.animH;
+//            ourShader.setInt("offset", int(worldData->currentFrame*10) % w + w*3);
+//            ourShader.setInt("wcount", w);
+//            ourShader.setInt("hcount", h);
+//            //ourShader.setInt("allcount", 30);
+//
+//            //glDisable(GL_DEPTH_TEST);
+//            glBindVertexArray(VAO);
+//            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+//        }
+//        else
+//        {
+//            glm::mat4 model = glm::mat4(1.0f);
+//            model = translate(model, rest.ModelOffset + it->second->pos.glm());
+//            model = glm::scale(model,glm::vec3(rest.pixelX*0.01f, rest.pixelX*0.01f, rest.pixelX*0.01f));
+//            ourShader.setMat4("MVP", projection * view * model);
+//            ourShader.setInt("offset", 0);
+//            ourShader.setInt("wcount", 1);
+//            ourShader.setInt("hcount", 1);
+//            //ourShader.setInt("allcount", 30);
+//
+//            //glDisable(GL_DEPTH_TEST);
+//            glBindVertexArray(VAO);
+//            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+//
+//        }
+//
+//
+//
+//    }
 
-    std::map<float, UnitData*> sorted;
-    for (auto& E: map1Unit)
+    ::Color c(1.0,1.0,1.0,1.0);
     {
-        auto pos = glm::vec3(Real::ToFloat(E.pos.x), Real::ToFloat(E.pos.y), Real::ToFloat(E.pos.z));
-        float distance = glm::length(worldData->camera.Position - pos);
-        sorted[distance] = &E;
-    }
-
-
-    auto & ourShader = *shader[SHADER_LOGIC_TYPE::SHADER_LOGIC_TYPE_2D];
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-
-
-
-    // render container
-    ourShader.use();
-
-    glm::mat4 projection = worldData->proj;
-    glm::mat4 view = worldData->camera.getViewMatrix();
-
-    for(std::map<float, UnitData*>::reverse_iterator it = sorted.rbegin(); it != sorted.rend(); ++it)
-    {
-        auto & rest = resType[it->second->type];
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, textures[rest.modelTypeId]);
-        if(rest.animAll > 1){
-            glm::mat4 model = glm::mat4(1.0f);
-            model = translate(model, rest.ModelOffset + it->second->pos.glm());
-            model = glm::scale(model,glm::vec3(rest.pixelX*0.01f, rest.pixelX*0.01f, rest.pixelX*0.01f));
-            ourShader.setMat4("MVP", projection * view * model);
-            int w = rest.animW, h = rest.animH;
-            ourShader.setInt("offset", int(worldData->currentFrame*10) % w + w*3);
-            ourShader.setInt("wcount", w);
-            ourShader.setInt("hcount", h);
-            //ourShader.setInt("allcount", 30);
-
-            //glDisable(GL_DEPTH_TEST);
-            glBindVertexArray(VAO);
-            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-        }
-        else
+        shader[SHADER_LOGIC_TYPE_2D2]->use();
         {
-            glm::mat4 model = glm::mat4(1.0f);
-            model = translate(model, rest.ModelOffset + it->second->pos.glm());
-            model = glm::scale(model,glm::vec3(rest.pixelX*0.01f, rest.pixelX*0.01f, rest.pixelX*0.01f));
-            ourShader.setMat4("MVP", projection * view * model);
-            ourShader.setInt("offset", 0);
-            ourShader.setInt("wcount", 1);
-            ourShader.setInt("hcount", 1);
-            //ourShader.setInt("allcount", 30);
-
-            //glDisable(GL_DEPTH_TEST);
-            glBindVertexArray(VAO);
-            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
+            glBindFramebuffer(GL_FRAMEBUFFER, FBO2D[0]);
+            glBindTexture(GL_TEXTURE_2D, Buffer2D[0]);
         }
+        glClear(GL_COLOR_BUFFER_BIT);
+    }
 
+//    for(auto E:map1tile)
+//    {
+//        Texture2DEx &t = resType[E.type];
+//
+//
+//        drawTexture(Real::ToFloat(E.pos.x),Real::ToFloat(E.pos.y)
+//                , t.texture, t.texcoords, c, worldData->currentFrame, t.animW, t.animH);
+//
+//
+//    }
+
+    for(auto E:map1tile)
+    {
+        Texture2DEx &t = resType[E.type];
+
+
+        drawTexture(Real::ToFloat(E.pos.x) + t.ModelOffset.x,Real::ToFloat(E.pos.y) + t.ModelOffset.y
+                , t.texture, t.texcoords, c, worldData->currentFrame, t.animW, t.animH);
+
+
+    }
+
+    for(auto E:map1Unit)
+    {
+        Texture2DEx &t = resType[E.type];
+
+
+        drawTexture(Real::ToFloat(E.pos.x) + t.ModelOffset.x,Real::ToFloat(E.pos.y) + t.ModelOffset.y
+        , t.texture, t.texcoords, c, worldData->currentFrame, t.animW, t.animH);
 
 
     }
 
 
+    {
+        glBindVertexArray(0);
 
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+
+        shader[SHADER_LOGIC_TYPE_DEBUG]->use();
+        shader[SHADER_LOGIC_TYPE_DEBUG]->setInt("depthMap", 0);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, Buffer2D[0]);
+        //if(int(curframe)%2 == 0)
+        renderQuad();
+    }
 //    model = translate(model, glm::vec3(0.1, 0.0f, -1));
 //    //model = glm::scale(model,glm::vec3(1.0, 2.0f, 1.0));
 //    ourShader.setMat4("MVP", projection * view * model);
@@ -380,7 +511,6 @@ int Render::init() {
 int Render::draw() {
     float &currentFrame = worldData->currentFrame;
 
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glViewport(0, 0, worldData->w, worldData->h);
 
@@ -618,7 +748,6 @@ void Render::getDepthMap() {
 
 void Render::drawModelWithShadow() {
 
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glViewport(0, 0, worldData->w, worldData->h);
 
