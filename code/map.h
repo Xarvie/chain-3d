@@ -8,27 +8,8 @@
 #include <vector>
 #include <map>
 
-#include "Unit.h"
 
-class Map
-{
-public:
 
-    int init(int x, int y, int z)
-    {
-        return 0;
-    }
-    int add(Unit* unit){
-        glm::int64_t id = (int64_t)unit;
-        data[id] = unit;
-        return 0;
-    }
-
-    int x;
-    int y;
-    int z;
-    std::map<int64_t, Unit*> data;
-};
 
 static char map1[15][15] =
         {
@@ -52,8 +33,6 @@ static char map1[15][15] =
 struct UnitData{
     vec3r pos;
     int type;
-
-
 };
 
 struct Texture2DEx{
@@ -70,6 +49,7 @@ struct Texture2DEx{
     int load()
     {
         texture = new Texture(GL_TEXTURE_2D,modelName, TextureEnum::IMAGE);
+
         this->texcoords[0] = glm::vec2(0, 0);
         this->texcoords[1] = glm::vec2(0, 1);
         this->texcoords[2] = glm::vec2(1, 1);
@@ -96,13 +76,12 @@ static std::vector<Texture2DEx> resType = {
 
 
 
-static std::vector<UnitData> map1Unit = {
+static std::vector<std::pair<vec3r, int>> map1Unit = {
         { vec3r(Real::FromInt(40*2),    Real::FromInt(40*2)     ,Real::FromInt(1)),0},
         { vec3r(Real::FromInt(40*2),    Real::FromInt(40*2)     ,Real::FromInt(1)),1},
 };
 
 static int sss[][4] = {
-
               {0	,	0	,	1	,	5},
               {40	,	0	,	1	,	5},
               {80	,	0	,	1	,	5},

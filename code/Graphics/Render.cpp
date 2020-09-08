@@ -6,6 +6,7 @@
 
 #include <Graphics/Camera.h>
 #include <Graphics/Shader.h>
+#include <Queue.h>
 
 #include "Config.h"
 #include "Model.h"
@@ -26,7 +27,7 @@ float exposure = 1.0f;
 unsigned int quadVAO = 0;
 unsigned int quadVBO = 0;
 
-
+moodycamel::ConcurrentQueue<Render::Task> taskQueue;
 
 int Render::render2DInit()
 {
@@ -76,12 +77,7 @@ int Render::render2DInit()
     {
         E.load();
     }
-    for(int i = 0; i < sizeof(sss) / sizeof(sss[0]); i++)
-    {
-        UnitData x = { vec3r(Real::FromInt( sss[i][0]),    Real::FromInt(sss[i][1])     ,Real::FromInt(sss[i][2])),sss[i][3]};
-        map1tile.push_back(x);
 
-    }
 
 
 
@@ -267,7 +263,20 @@ int Render::render2dDraw()
         }
         glClear(GL_COLOR_BUFFER_BIT);
     }
+    if(!this->maps.empty())
+    for(auto E:this->maps[this->curMapIndex].spiritSet){
+        Texture2DEx &t = resType[E.modelObj.spiritModelId];
+        drawTexture(Real::ToFloat(E.posObj.pos.x) + t.ModelOffset.x,Real::ToFloat(E.posObj.pos.y) + t.ModelOffset.y
+                , t.texture, t.texcoords, c, worldData->currentFrame, t.animW, t.animH);
 
+    }
+    if(!this->maps.empty())
+    for(auto E:this->maps[this->curMapIndex].unitSet){
+        Texture2DEx &t = resType[E.modelObj.spiritModelId];
+        drawTexture(Real::ToFloat(E.posObj.pos.x) + t.ModelOffset.x,Real::ToFloat(E.posObj.pos.y) + t.ModelOffset.y
+                , t.texture, t.texcoords, c, worldData->currentFrame, t.animW, t.animH);
+
+    }
 //    for(auto E:map1tile)
 //    {
 //        Texture2DEx &t = resType[E.type];
@@ -279,27 +288,27 @@ int Render::render2dDraw()
 //
 //    }
 
-    for(auto E:map1tile)
-    {
-        Texture2DEx &t = resType[E.type];
+//    for(auto E:map1tile)
+//    {
+//        Texture2DEx &t = resType[E.type];
+//
+//
+//        drawTexture(Real::ToFloat(E.pos.x) + t.ModelOffset.x,Real::ToFloat(E.pos.y) + t.ModelOffset.y
+//                , t.texture, t.texcoords, c, worldData->currentFrame, t.animW, t.animH);
+//
+//
+//    }
 
-
-        drawTexture(Real::ToFloat(E.pos.x) + t.ModelOffset.x,Real::ToFloat(E.pos.y) + t.ModelOffset.y
-                , t.texture, t.texcoords, c, worldData->currentFrame, t.animW, t.animH);
-
-
-    }
-
-    for(auto E:map1Unit)
-    {
-        Texture2DEx &t = resType[E.type];
-
-
-        drawTexture(Real::ToFloat(E.pos.x) + t.ModelOffset.x,Real::ToFloat(E.pos.y) + t.ModelOffset.y
-        , t.texture, t.texcoords, c, worldData->currentFrame, t.animW, t.animH);
-
-
-    }
+//    for(auto E:map1Unit)
+//    {
+//        Texture2DEx &t = resType[E.type];
+//
+//
+//        drawTexture(Real::ToFloat(E.pos.x) + t.ModelOffset.x,Real::ToFloat(E.pos.y) + t.ModelOffset.y
+//        , t.texture, t.texcoords, c, worldData->currentFrame, t.animW, t.animH);
+//
+//
+//    }
 
 
     {
@@ -356,6 +365,11 @@ void renderQuad() {
 }
 
 #include "BatchSpriteScene.h"
+Render* Render::get()
+{
+    static Render r;
+    return &r;
+}
 
 int Render::init() {
 
@@ -503,10 +517,69 @@ int Render::init() {
 #endif
 
 
-
+    this->maps.emplace_back(Map{.index = 0,});
     return 0;
 }
 
+
+int Render::drawTask(Task t){
+    taskQueue.enqueue(t);
+    return 0;
+}
+
+
+int addUnit(Map& Map, Unit& u)
+{
+    Map.unitSet.emplace_back(u);
+    return 0;
+}
+int addSpirit(Map& Map, Unit& u)
+{
+    Map.spiritSet.emplace_back(u);
+    return 0;
+}
+
+int Render::update(){
+    static Task t;
+    while(taskQueue.try_dequeue(t))
+    {
+        switch (t.type)
+        {
+            case Render::Task::TYPE::ADD_SPIRIT:
+            {
+                addSpirit(this->maps[0], t.u);
+                break;
+            }
+            case Render::Task::TYPE::MOD_SPIRIT:
+            {
+                break;
+            }
+            case Render::Task::TYPE::DEL_SPIRIT:
+            {
+                break;
+            }
+            case Render::Task::TYPE::ADD_UNIT:
+            {
+                addUnit(this->maps[0], t.u);
+                break;
+            }
+            case Render::Task::TYPE::MOD_UNIT:
+            {
+                break;
+            }
+            case Render::Task::TYPE::DEL_UNIT:
+            {
+                break;
+            }
+            default:
+            {
+                assert(NULL && "crash");
+            }
+
+        }
+    }
+    return 0;
+}
 
 int Render::draw() {
     float &currentFrame = worldData->currentFrame;
@@ -676,54 +749,29 @@ int Render::drawModels(DRAW_TYPE type) {
 
 
 
-    for(auto & E : worldData->map1.data)
-    {
-        model = glm::mat4(1.0f);
-
-        int modelID = E.second->modelID;
-        float x = Real::ToFloat(E.second->pos.x);
-        float y = Real::ToFloat(E.second->pos.y);
-        float z = Real::ToFloat(E.second->pos.z);
-
-        if(E.second->anim)
-        {
-            model = glm::mat4(1.0f);
-            //model = scale(model, glm::vec3(0.5f));
-            model = translate(model, glm::vec3(x, 1.0f, y));
-            //model = rotate(model, glm::radians(-90.0f), glm::vec3(1, 0, 0));
-            animModels[modelID]->draw(type, 1, curShader, model, view, projection, currentFrame);
-        }
-        else
-        {
-            model = translate(model, glm::vec3(x, 1.0f, y));
-            //model = rotate(model, glm::radians(-90.0f), glm::vec3(1, 0, 0));
-            model = scale(model, glm::vec3(0.8f));
-            staticModels[modelID]->draw(type, 1, curShader, model, view, projection, currentFrame);
-        }
-
-
-    }
-//    for(int x = 0; x < 15; x++)
-//        for(int y = 0; y < 15; y++)
+//    for(auto & E : worldData->map1.data)
+//    {
+//        model = glm::mat4(1.0f);
+//
+//        int modelID = E.second->modelID;
+//        float x = Real::ToFloat(E.second->pos.x);
+//        float y = Real::ToFloat(E.second->pos.y);
+//        float z = Real::ToFloat(E.second->pos.z);
+//
+//        if(E.second->anim)
 //        {
-//            if(map1[x][y] == 2)
-//            {
-//
-//            }
+//            model = glm::mat4(1.0f);
+//            //model = scale(model, glm::vec3(0.5f));
+//            model = translate(model, glm::vec3(x, 1.0f, y));
+//            //model = rotate(model, glm::radians(-90.0f), glm::vec3(1, 0, 0));
+//            animModels[modelID]->draw(type, 1, curShader, model, view, projection, currentFrame);
 //        }
-
-
-
-
-
-//    auto srcModel = model;
-//
-//    int halfDist = 2;
-//
-//    for (int x = -halfDist; x < halfDist; x++) {
-//        for (int y = -halfDist; y < halfDist; y++) {
-//            model = translate(srcModel, glm::vec3(x * 8, y * 8, 0));
-//            animModels[0]->draw(type, 1, curShader, model, view, projection, currentFrame);
+//        else
+//        {
+//            model = translate(model, glm::vec3(x, 1.0f, y));
+//            //model = rotate(model, glm::radians(-90.0f), glm::vec3(1, 0, 0));
+//            model = scale(model, glm::vec3(0.8f));
+//            staticModels[modelID]->draw(type, 1, curShader, model, view, projection, currentFrame);
 //        }
 //    }
 

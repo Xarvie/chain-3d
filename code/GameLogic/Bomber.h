@@ -4,11 +4,16 @@
 
 #ifndef INC_3D_BOMBER_H
 #define INC_3D_BOMBER_H
-#include "Unit.h"
 
+
+#include "Component.h"
+#include "MapMgr.h"
 
 class Bomber {
 public:
+    int init();
+    int initMap();
+    int initUnit();
 
     int upEvent(bool press);
     int downEvent(bool press);
@@ -22,8 +27,9 @@ public:
     int startEvent(bool press);
     int backEvent(bool press);
 
-    Unit* unit1;
-};
 
+    GameData gd;
+};
+extern Bomber* game;
 
 #endif //INC_3D_BOMBER_H

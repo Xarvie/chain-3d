@@ -10,10 +10,10 @@
 #include <set>
 #include <vector>
 #include <map>
-#include "Unit.h"
-#include "vec3r.h"
+#include "Component.h"
 
 class AABB;
+
 
 class Collision {
 public:
@@ -31,23 +31,23 @@ public:
 extern Collision *worldCollision;
 
 
-class AABB {
+class AABBUtil {
 
 public:
     /**
      * Constructor.
      */
-    AABB();
+    AABBUtil();
 
     /**
      * Constructor.
      */
-    AABB(const vec3r &min, const vec3r &max);
+    AABBUtil(const vec3r &min, const vec3r &max);
 
     /**
      * Constructor.
      */
-    AABB(const AABB &box);
+    AABBUtil(const AABBUtil &box);
 
     /**
      * Gets the center point of the bounding box.
@@ -71,7 +71,7 @@ public:
     /**
      * Tests whether this bounding box intersects the specified bounding object.
      */
-    bool intersects(const AABB &aabb) const;
+    bool intersects(const AABBUtil &aabb) const;
 
     /**
      * check whether the point is in.
@@ -82,7 +82,7 @@ public:
      * Sets this bounding box to the smallest bounding box
      * that contains both this bounding object and the specified bounding box.
      */
-    void merge(const AABB &box);
+    void merge(const AABBUtil &box);
 
     /**
      * Sets this bounding box to the specified values.
@@ -107,8 +107,8 @@ public:
     void transform(const glm::mat4 &mat);
 
 public:
-    vec3r _min;
-    vec3r _max;
+
+    AABBData aabb;
 };
 
 

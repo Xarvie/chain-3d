@@ -4,69 +4,67 @@
 #include <chrono>
 #include <thread>
 #include "Collision.h"
+#include <Queue.h>
+#include <atomic>
+
+std::atomic<char> waiting = 2;
 
 int main() {
-    worldData = new WorldData();
-    auto& d = *worldData->d;
-    d.init();
-    d.createWindow("ChainProject", 600, 535, 0, 1);
 
-    d.VSYNC(worldData->vsync);
-    Render r;
-    r.init();
-    r.render2DInit();
-    r.init2d2(worldData->w, worldData->h);
+    std::thread rt1 = std::thread([&] {
+        worldData = new WorldData();
+        auto &d = *worldData->d;
+        d.init();
+        d.createWindow("ChainProject", 600, 535, 0, 1);
 
-    auto & ourShader = *r.shader[Render::SHADER_LOGIC_TYPE::SHADER_LOGIC_TYPE_2D2];
-    glEnable(GL_BLEND);
-    glBlendEquation(GL_FUNC_ADD);
-    glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO);
-    ourShader.use();
+        d.VSYNC(worldData->vsync);
 
-//    worldData->pGraphicsContext = new GraphicsContext(800, 600);
-//    worldData->pRenderer = new Renderer();
-//    worldData->pGraphicsContext->SetRenderer(worldData->pRenderer);
-//    worldData->pRenderer->SetGraphicsContext(worldData->pGraphicsContext);
+        worldData->lastFrame = d.getTime();
 
-//    worldData->pPainter = new Painter(worldData->pGraphicsContext);
+        Render *r = Render::get();
+        r->init();
+        r->render2DInit();
+        r->init2d2(worldData->w, worldData->h);
 
-//    worldData->pCurrentTestScene = new BatchSpriteScene;
-
-
-
-    worldData->lastFrame = d.getTime();
-
-//    Texture* t1 = new Texture(GL_TEXTURE_2D, RES_DIR"2d/boom.png", IMAGE);
-//    Texture* t2 = new Texture(GL_TEXTURE_2D, RES_DIR"2d/bb.png", IMAGE);
-
-    while (d.shouldClose()) {
-        d.processInput();
-//        worldData->pGraphicsContext->BeginRender();
-//        worldData->pGraphicsContext->ResetDrawcall();
-        worldData->updateTime(d.getTime());
-//        worldData->pCurrentTestScene->Update(worldData->deltaTime);
-        glDisable(GL_DEPTH_TEST);
+        auto &ourShader = *r->shader[Render::SHADER_LOGIC_TYPE::SHADER_LOGIC_TYPE_2D2];
+        glEnable(GL_BLEND);
+        glBlendEquation(GL_FUNC_ADD);
+        glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO);
         glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
-        glViewport(0, 0, worldData->w, worldData->h);
         ourShader.use();
-        ::Color c(1, 1, 1, 1.0f);
+        waiting--;
 
-        r.render2dDraw();
-        //r.drawTexture(0, 0, &t1, c, worldData->currentFrame);
-        //r.drawTexture(t1->w/2, t1->h/2, t2, c, worldData->currentFrame);
-        //r.drawTexture(t1->w/2/2, t1->h/2/2, t2, c);
-        //r.draw();
+        while (d.shouldClose()) {
+            d.pollEvents();
+            worldData->updateTime(d.getTime());
+            glDisable(GL_DEPTH_TEST);
 
-//        worldData->pCurrentTestScene->Draw(worldData->pPainter);
-//        worldData->pGraphicsContext->EndRender();
+            glClear(GL_COLOR_BUFFER_BIT);
+            glViewport(0, 0, worldData->w, worldData->h);
+            ourShader.use();
+
+            r->update();
+            r->render2dDraw();
+            d.processInput();
+            d.swapBuffers();
+        }
+        worldData->d->shutDown();
+    });
 
 
-        d.swapBuffers();
-        d.pollEvents();
+    std::thread rt2 = std::thread([&] {
+        waiting--;
+        while (waiting);
+        game = new Bomber();
+        game->init();
+        while (worldData->d->shouldClose()) {
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+        }
+    });
 
 
-    }
-    d.shutDown();
+    rt2.join();
+    rt1.join();
+
     return 0;
 }

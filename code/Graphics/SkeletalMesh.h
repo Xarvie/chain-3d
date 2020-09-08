@@ -92,13 +92,11 @@ private:
             numIndices = 0;
             baseVertex = 0;
             baseIndex = 0;
-            materialIndex = INVALID_MATERIAL;
         }
 
         unsigned int numIndices;
         unsigned int baseVertex;
         unsigned int baseIndex;
-        [[maybe_unused]] unsigned int materialIndex;
         std::vector<Texture> _textures;
     };
 

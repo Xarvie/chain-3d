@@ -151,9 +151,12 @@ target_include_directories(${CMAKE_PROJECT_NAME}
 #target_include_directories(${CMAKE_PROJECT_NAME}
 #        PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/general/)
 
+#HeadOnly Library
 target_include_directories(${CMAKE_PROJECT_NAME}
         PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/general/rapidjson/)
 
+target_include_directories(${CMAKE_PROJECT_NAME}
+        PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/general/entt-3.4.0/src/)
 
 IF(CMAKE_SYSTEM_NAME MATCHES "Windows")
 target_include_directories(${CMAKE_PROJECT_NAME}
@@ -185,6 +188,7 @@ target_include_directories(${CMAKE_PROJECT_NAME}
         PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/win64/fmt/include/)
         
 ENDIF()
+
 
 
 

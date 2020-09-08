@@ -6,6 +6,7 @@
 #ifndef INC_3D_RENDER_H
 #define INC_3D_RENDER_H
 
+#include <GameLogic/Component.h>
 #include "Model.h"
 #include "Particle.h"
 
@@ -38,7 +39,7 @@ struct RenderUnit
     glm::vec2* pTexcoords;
     int nPositionCount;
 
-    Color color;
+    ::Color color;
 
     GLuint* pIndices;
     int nIndexCount;
@@ -67,10 +68,29 @@ public:
         DRAW_TYPE_ANIM_MODEL_WITH_SHADOW,
         DRAW_TYPE_ANIM_MODEL_WITH_BLOOM,
     };
+    struct Task{
+        enum TYPE : int
+        {
+            ADD_SPIRIT = 0,
+            MOD_SPIRIT = 1,
+            DEL_SPIRIT = 2,
+            ADD_UNIT = 3,
+            MOD_UNIT = 4,
+            DEL_UNIT = 5,
+        };
+        int type;
+        Unit u;
+    };
+
+
 public:
+    static Render* get();
     int init();
 
     int draw();
+
+    int update();
+
 
     int drawModels(DRAW_TYPE type);
     int shaderSetParam(Shader* shader, DRAW_TYPE type);
@@ -81,9 +101,11 @@ public:
 
     int render2DInit();
     int render2dDraw();
+
+    int drawTask(Task t);
     std::vector<glm::vec3> vPositions;
     std::vector<glm::vec2> vTexcoords;
-    std::vector<Color> vColors;
+    std::vector<::Color> vColors;
     std::vector<GLuint>vIndices;
 
 
@@ -96,6 +118,8 @@ public:
 
     GLuint FBO2D[2];
     GLuint Buffer2D[2];
+
+    int curMapIndex = 0;
     int init2d2(int w, int h)
     {
 
@@ -145,7 +169,7 @@ public:
         return 0;
     }
 
-    void drawTexture(float x, float y, Texture* texture, glm::vec2* texcoords, Color& color, float curframe, int animW, int animH);
+    void drawTexture(float x, float y, Texture* texture, glm::vec2* texcoords, ::Color& color, float curframe, int animW, int animH);
 
 
 public:
@@ -169,6 +193,7 @@ protected:
     Particle * p = nullptr;
     World * t = nullptr;
     gui *g = nullptr;
+    std::vector<Map> maps;
 
     std::vector<unsigned int >textures;
     unsigned int VBO, VAO, EBO;

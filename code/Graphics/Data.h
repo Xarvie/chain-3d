@@ -18,6 +18,7 @@
 #include "Collision.h"
 #include "map.h"
 #include "BatchSpriteScene.h"
+#include <entt/signal/dispatcher.hpp>
 
 class Data {
 
@@ -101,6 +102,7 @@ public:
     Map map1;
     Unit *unit1 = nullptr;
     Bomber* bomber;
+
 };
 
 extern WorldData* worldData;
