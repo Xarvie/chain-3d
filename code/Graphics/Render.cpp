@@ -489,6 +489,8 @@ int Render::init() {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     }
+
+#ifdef USE_3D
     std::vector<std::string> resName(3+1);
     resName[0] = RES_DIR"";
     resName[1] = RES_DIR"gas.dae";
@@ -506,6 +508,7 @@ int Render::init() {
         else
             staticModels[i] = x;
     }
+#endif
     t = new World;
     t->renderInit();
 
