@@ -128,7 +128,7 @@ target_include_directories(IMGUI
 set(LIBS ${LIBS} IMGUI)
 
 ADD_EXECUTABLE(${CMAKE_PROJECT_NAME}
-    ${CODEFILES} code/vec3r.h)
+    ${CODEFILES})
 target_include_directories(${CMAKE_PROJECT_NAME}
         PUBLIC ${INCLUDEDIRS})
 
@@ -162,7 +162,7 @@ ENDIF()
 set(SDL 1)
 set(GLFW 0)
 if(SDL)
-    #add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/general/sdl/source")
+    #add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/general/cdl/source")
 #    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/general/sdl")
 #    set (SDL2_DIR "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/general/sdl")
 #    link_directories(${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/lib)
@@ -189,10 +189,16 @@ if(SDL)
                 PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/mingw64/sdl/include/)
 
     ELSE()
-
+        set(SDL2_PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/bsd/sdl)
+        set(SDL2_LIBDIR "${SDL2_PREFIX}/lib")
+        set(SDL2_LIBRARIES "-L${SDL2_LIBDIR}")
+        #set(SDL2_LIBRARIES ${SDL2_LIBRARIES})
+        #message (${SDL2_LIBDIR}/libSDL2.a)
+        set(SDL2_INCLUDE_DIRS "${SDL2_PREFIX}/include/SDL2")
+        set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -L${SDL2_LIBDIR} -Wl,-search_paths_first  -Wno-unused-command-line-argument -lm -liconv -Wl,-framework,CoreAudio -Wl,-framework,AudioToolbox -Wl,-framework,ForceFeedback -lobjc -Wl,-framework,CoreVideo -Wl,-framework,Cocoa -Wl,-framework,Carbon -Wl,-framework,IOKit -Wl,-weak_framework,QuartzCore -Wl,-weak_framework,Metal")
         target_include_directories(${CMAKE_PROJECT_NAME}
-                PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/mingw64/sdl/include/)
-
+                PUBLIC ${SDL2_INCLUDE_DIRS})
+        set(LIBS ${LIBS} ${SDL2_LIBRARIES} libSDL2.a)
     ENDIF()
 
 

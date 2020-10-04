@@ -63,7 +63,9 @@ public:
     bool show_another_window = false;
 
     ImGuiIO* io;
+#if USE_SDL2
     SDL_GLContext* gl_context;
+#endif
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
     //const char* fileToEdit = "C:/Users/Xarvie/Desktop/code/imgui-glfw3/code/imgui_demo.cpp";
 };

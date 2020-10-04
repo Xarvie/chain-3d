@@ -519,7 +519,9 @@ int Render::init() {
     g = new gui();
     g->init((DeviceWindow*)worldData->d->_window->_glfwPtr);//20m
 
+#if (USE_SDL2)
     g->gl_context = &Device::_window->sdlContext;
+#endif
     #endif
 
 

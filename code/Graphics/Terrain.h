@@ -18,7 +18,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "camera.h"
+#include "Camera.h"
 #include <map>
 #include <unordered_map>
 #include <tuple>

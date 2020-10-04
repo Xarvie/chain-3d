@@ -1,5 +1,5 @@
 #pragma once
-#include "Math.h"
+#include "math.h"
 #include "Program.h"
 #include "StandardProgram.h"
 

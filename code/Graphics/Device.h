@@ -47,7 +47,6 @@ class Device {
 public:
     Device();
 
-    typedef SDL_Window DeviceWindow;
     Device(const Device &) = delete;
 
 public:
@@ -126,7 +125,9 @@ public:
         int _bh;
         void *_glfwPtr;
         void *content;
+#if (USE_SDL2)
         SDL_GLContext sdlContext;
+#endif
     };
 
     static Window *_window;

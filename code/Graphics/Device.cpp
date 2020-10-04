@@ -192,9 +192,6 @@ Device::Device() {
 
 };
 
-bool Device::running() {
-    return _running;
-}
 void Device::getScreenSize(int &width, int &height, int monitorID) {
     if (monitorID >= _monitors.size())
         return;
@@ -424,12 +421,8 @@ void Device::scroll_callback(DeviceWindow *window, double xoffset, double yoffse
     worldData->camera.ProcessMouseScroll(yoffset);
 }
 
-bool Device::shouldClose() {
-    return !glfwWindowShouldClose((DeviceWindow *) this->_window->_glfwPtr);
-}
-
 void Device::swapBuffers() {
-    glfwSwapBuffers((DeviceWindow *) this->_window->_glfwPtr);
+    glfwSwapBuffers((DeviceWindow *) Device::_window->_glfwPtr);
 }
 
 void Device::pollEvents() {
@@ -452,13 +445,27 @@ void Device::VSYNC(bool on)
 void Device::MSAA() {
         glfwWindowHint(GLFW_SAMPLES, worldData->MSAA);
 }
-
+bool Device::running() {
+    _running = !glfwWindowShouldClose((DeviceWindow *) this->_window->_glfwPtr);
+    return _running;
+}
 #else
 #include "SDL.h"
 void Device::init() {
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         abort();
     }
+
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
+
+    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+    SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
+
     int monitorCount = 0;
     _window = new Device::Window();
     monitorCount = SDL_GetNumVideoDisplays();
@@ -487,6 +494,7 @@ int Device::createWindow(std::string title, int x, int y, int fullScreen, int lo
                                     x, y,
                                     SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
 
+    std::cout << SDL_GetError() << std::endl;
     Device::_window->sdlContext = SDL_GL_CreateContext(window);
     Device::_window->_glfwPtr = window;
 
@@ -637,6 +645,10 @@ void Device::scroll_callback(DeviceWindow *window, double xoffset, double yoffse
 
 void Device::swapBuffers() {
     SDL_GL_SwapWindow((DeviceWindow *) Device::_window->_glfwPtr);
+}
+
+bool Device::running() {
+    return _running;
 }
 
 void Device::pollEvents() {

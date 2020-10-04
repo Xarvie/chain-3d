@@ -139,7 +139,7 @@ int gui::init(DeviceWindow* window)
     ImGui::StyleColorsDark();
     //ImGui::StyleColorsClassic();
 
-#ifdef USE_SDL2
+#if (USE_SDL2)
     ImGui_ImplSDL2_InitForOpenGL(window, gl_context);
     ImGui_ImplOpenGL3_Init(glsl_version);
 #else
@@ -170,14 +170,14 @@ int gui::init(DeviceWindow* window)
     ImFont* font2 = io->Fonts->AddFontFromFileTTF("c:/Windows/Fonts/consola.ttf", 16, &config, ranges1);
     IM_ASSERT(font2 != NULL);
 #elif defined(LINUX)
-    ImFont* font = io.Fonts->AddFontFromFileTTF(RES_DIR"Font/zqk.ttf", 16, NULL, ranges2);
+    ImFont* font = io->Fonts->AddFontFromFileTTF(RES_DIR"Font/zqk.ttf", 16, NULL, ranges2);
     IM_ASSERT(font != NULL);
-    ImFont* font2 = io.Fonts->AddFontFromFileTTF("c:/Windows/Fonts/consola.ttf", 16, &config, ranges1);
+    ImFont* font2 = io->Fonts->AddFontFromFileTTF("c:/Windows/Fonts/consola.ttf", 16, &config, ranges1);
     IM_ASSERT(font2 != NULL);
 #elif defined(__APPLE__)
-    ImFont* font = io.Fonts->AddFontFromFileTTF(RES_DIR"Font/zqk.ttf", 16, NULL, ranges2);
+    ImFont* font = io->Fonts->AddFontFromFileTTF(RES_DIR"Font/zqk.ttf", 16, NULL, ranges2);
     IM_ASSERT(font != NULL);
-    ImFont* font2 = io.Fonts->AddFontFromFileTTF("/System/Library/Fonts/Menlo.ttc", 16, &config, ranges1);
+    ImFont* font2 = io->Fonts->AddFontFromFileTTF("/System/Library/Fonts/Menlo.ttc", 16, &config, ranges1);
     IM_ASSERT(font2 != NULL);
 #endif
 
