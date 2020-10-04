@@ -267,6 +267,8 @@ int Device::createWindow(std::string title, int x, int y, int fullScreen, int lo
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+    //glfwWindowHint(GLFW_SCALE_TO_MONITOR, GLFW_FALSE);
+
     //std::this_thread::sleep_for(std::chrono::seconds(10));
     GLFWmonitor *pMonitor = isFullScreen ? glfwGetPrimaryMonitor() : NULL;
     DeviceWindow *window = glfwCreateWindow(x, y, title.c_str(), pMonitor, NULL);
@@ -275,7 +277,7 @@ int Device::createWindow(std::string title, int x, int y, int fullScreen, int lo
         glfwTerminate();
         return -1;
     }
-    this->_window->_glfwPtr = window;
+    this->_window->rawPtr = window;
     glfwMakeContextCurrent(window);
     glfwSetErrorCallback(error_callback);
     glfwSetKeyCallback(window, key_callback);
@@ -307,7 +309,7 @@ int Device::createWindow(std::string title, int x, int y, int fullScreen, int lo
 
 
 void Device::getWindowsSize(int &width, int &height, int windowID) {
-    glfwGetFramebufferSize(static_cast<DeviceWindow *>(_window->_glfwPtr), &width,
+    glfwGetFramebufferSize(static_cast<DeviceWindow *>(_window->rawPtr), &width,
                            &height);
 }
 
@@ -369,7 +371,7 @@ void Device::key_callback(DeviceWindow *window, int key, int scancode, int actio
 }
 
 void Device::processInput() {
-    DeviceWindow *window = (DeviceWindow *) Device::_window->_glfwPtr;
+    DeviceWindow *window = (DeviceWindow *) Device::_window->rawPtr;
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
@@ -422,7 +424,7 @@ void Device::scroll_callback(DeviceWindow *window, double xoffset, double yoffse
 }
 
 void Device::swapBuffers() {
-    glfwSwapBuffers((DeviceWindow *) Device::_window->_glfwPtr);
+    glfwSwapBuffers((DeviceWindow *) Device::_window->rawPtr);
 }
 
 void Device::pollEvents() {
@@ -446,7 +448,7 @@ void Device::MSAA() {
         glfwWindowHint(GLFW_SAMPLES, worldData->MSAA);
 }
 bool Device::running() {
-    _running = !glfwWindowShouldClose((DeviceWindow *) this->_window->_glfwPtr);
+    _running = !glfwWindowShouldClose((DeviceWindow *) this->_window->rawPtr);
     return _running;
 }
 #else
@@ -490,13 +492,18 @@ void Device::init() {
 
 int Device::createWindow(std::string title, int x, int y, int fullScreen, int lockMouse) {
     auto* window = SDL_CreateWindow(title.c_str(),
-                                    SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+                                    0, 0,
                                     x, y,
                                     SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
 
-    std::cout << SDL_GetError() << std::endl;
+    if(window == nullptr)
+    {
+        std::cout << SDL_GetError() << std::endl;
+        abort();
+    }
+
     Device::_window->sdlContext = SDL_GL_CreateContext(window);
-    Device::_window->_glfwPtr = window;
+    Device::_window->rawPtr = window;
     SDL_GL_MakeCurrent(window, Device::_window->sdlContext);
 
     if (!gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress)) {
@@ -522,7 +529,7 @@ int Device::createWindow(std::string title, int x, int y, int fullScreen, int lo
 
 void Device::getWindowsSize(int &width, int &height, int windowID) {
 
-    SDL_GetWindowSize(static_cast<DeviceWindow*>(_window->_glfwPtr), &width, &height);
+    SDL_GetWindowSize(static_cast<DeviceWindow*>(_window->rawPtr), &width, &height);
 
 }
 
@@ -645,7 +652,7 @@ void Device::scroll_callback(DeviceWindow *window, double xoffset, double yoffse
 }
 
 void Device::swapBuffers() {
-    SDL_GL_SwapWindow((DeviceWindow *) Device::_window->_glfwPtr);
+    SDL_GL_SwapWindow((DeviceWindow *) Device::_window->rawPtr);
 }
 
 bool Device::running() {
@@ -661,7 +668,7 @@ void Device::pollEvents() {
                 _running = false;
             case SDL_KEYDOWN:
             case SDL_KEYUP:{
-                this->key_callback((DeviceWindow *) this->_window->_glfwPtr,
+                this->key_callback((DeviceWindow *) this->_window->rawPtr,
                                    e.key.keysym.sym,
                                    e.key.keysym.scancode,
                                    e.type,
@@ -670,7 +677,7 @@ void Device::pollEvents() {
             }
             case SDL_MOUSEBUTTONDOWN:
             case SDL_MOUSEBUTTONUP:
-                this->mouse_button_callback((DeviceWindow *) this->_window->_glfwPtr,e.button.button ,e.type, 0);
+                this->mouse_button_callback((DeviceWindow *) this->_window->rawPtr, e.button.button , e.type, 0);
             case SDL_MOUSEMOTION:
             {
 
@@ -684,7 +691,7 @@ void Device::pollEvents() {
 
 void Device::shutDown() {
 
-    SDL_DestroyWindow((DeviceWindow *) this->_window->_glfwPtr);
+    SDL_DestroyWindow((DeviceWindow *) this->_window->rawPtr);
 }
 
 #include <ctime>

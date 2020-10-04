@@ -123,7 +123,7 @@ public:
         int _h;
         int _bw;
         int _bh;
-        void *_glfwPtr;
+        void *rawPtr;
         void *content;
 #if (USE_SDL2)
         SDL_GLContext sdlContext;

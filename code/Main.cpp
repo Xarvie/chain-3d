@@ -39,8 +39,7 @@ int main(int argc, char **argv){
     worldData = new WorldData();
     auto &d = *worldData->d;
     d.init();
-
-    d.createWindow("ChainProject", 1366, 1080, 0, 1);
+    d.createWindow("ChainProject", 1000, 1000, 0, 1);
 
     d.VSYNC(worldData->vsync);
 
