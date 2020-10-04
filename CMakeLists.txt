@@ -1,16 +1,17 @@
 if (POLICY CMP0048)
     cmake_policy(SET CMP0048 NEW)
-endif()
+endif ()
 
 PROJECT(3d)
-cmake_minimum_required (VERSION 3.12)
+cmake_minimum_required(VERSION 3.12)
 list(APPEND CMAKE_MODULE_PATH
-  "${CMAKE_SOURCE_DIR}/cmake/macros")
+        "${CMAKE_SOURCE_DIR}/cmake/macros")
 include(AutoCollect)
 set(CMAKE_CXX_STANDARD 17)
 
 set(USE_GCC ON)
-
+set(SDL 1)
+set(GLFW 0)
 
 add_definitions(-D_AFXDLL)
 set(CMAKE_MFC_FLAG 1)
@@ -19,21 +20,21 @@ find_package(Vulkan)
 if (DEFINED ENV{VULKAN_SDK})
     message(STATUS "Vulkan environment variable: $ENV{VULKAN_SDK}")
     set(VULKAN_INCLUDE "$ENV{VULKAN_SDK}/include")
-else()
+else ()
     message(STATUS "Vulkan environment variable: undefined")
     set(VULKAN_INCLUDE "")
-endif()
+endif ()
 
 #include_directories(${Vulkan_INCLUDE_DIRS})
 
 #C:\Users\caspasex\Desktop\3dm\thirdparty\mingw64\assimp3.3.1\lib
-if(WIN32 AND MINGW)
+if (WIN32 AND MINGW)
     set(ASSIMP_PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/mingw64/assimp)
-elseif(UNIX AND NOT APPLE)
+elseif (UNIX AND NOT APPLE)
     set(ASSIMP_PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/linux/assimp)
-else(APPLE)
+else (APPLE)
     set(ASSIMP_PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/bsd/assimp)
-endif()
+endif ()
 
 set(ASSIMP_LIBRARY "assimp" "IrrXML" "z")
 
@@ -51,12 +52,9 @@ set(LIBS ${LIBS} ${ASSIMP_LIBRARY})
 #link_directories(${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/lib)
 
 
-
-
 #include_directories(${Vulkan_INCLUDE_DIRS})
 
 #set(LIBS ${LIBS} ${Vulkan_LIBRARIES})
-
 
 
 #option(ASSIMP_BUILD_ASSIMP_TOOLS OFF)
@@ -79,23 +77,20 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/general/glm2)
 # cd build
 # cmake .. -G "MinGW Makefiles" -DCMAKE_SH="CMAKE_SH-NOTFOUND" -DCMAKE_CXX_FLAGS="-static"
 PickIncludeDirectories(
-    ${CMAKE_CURRENT_SOURCE_DIR}/code
-    INCLUDEDIRS
-    # Exclude
-    ${CMAKE_CURRENT_SOURCE_DIR}/build)
+        ${CMAKE_CURRENT_SOURCE_DIR}/code
+        INCLUDEDIRS
+        # Exclude
+        ${CMAKE_CURRENT_SOURCE_DIR}/build)
 
 PickSourceFiles(
-    ${CMAKE_CURRENT_SOURCE_DIR}/code
-    CODEFILES
-    # Exclude
-    ${CMAKE_CURRENT_SOURCE_DIR}/build)
+        ${CMAKE_CURRENT_SOURCE_DIR}/code
+        CODEFILES
+        # Exclude
+        ${CMAKE_CURRENT_SOURCE_DIR}/build)
 
 
 MakeFilter(
-    ${CMAKE_CURRENT_SOURCE_DIR}/code)
-
-
-
+        ${CMAKE_CURRENT_SOURCE_DIR}/code)
 
 
 add_library(STB_IMAGE "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/general/stb/stb_image.cpp")
@@ -110,25 +105,46 @@ include_directories(GLAD
 set(LIBS ${LIBS} GLAD)
 
 
-#PickIncludeDirectories(
-#        ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/general/imgui
-#        IMGUI_INCLUDEDIRS
-#        # Exclude
-#        ${CMAKE_CURRENT_SOURCE_DIR}/build)
+PickIncludeDirectories(
+        ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/general/imgui-1.78
+        IMGUI_HEADERS
+        # Exclude
+        ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/general/imgui-1.78/docs
+        ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/general/imgui-1.78/examples
+        ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/general/imgui-1.78/misc)
 
 PickSourceFiles(
-        ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/general/imgui
-        IMGUI_CODEFILES
+        ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/general/imgui-1.78
+        IMGUI_SOURCES
         # Exclude
-        ${CMAKE_CURRENT_SOURCE_DIR}/build)
+        ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/general/imgui-1.78/docs
+        ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/general/imgui-1.78/examples
+        ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/general/imgui-1.78/misc)
 
-add_library(IMGUI ${IMGUI_CODEFILES})
+add_library(IMGUI ${IMGUI_SOURCES})
 target_include_directories(IMGUI
         PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/general/imgui)
 set(LIBS ${LIBS} IMGUI)
 
+include_directories(${CMAKE_PROJECT_NAME}
+        PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/general/imgui-1.78/)
+
+include_directories(${CMAKE_PROJECT_NAME}
+        PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/general/imgui-1.78/examples)
+IF (GLFW)
+    set(CODEFILES ${CODEFILES}
+            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/general/imgui-1.78/examples/imgui_impl_opengl3.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/general/imgui-1.78/examples/imgui_impl_glfw.cpp
+            )
+ELSE ()
+    set(CODEFILES ${CODEFILES}
+            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/general/imgui-1.78/examples/imgui_impl_opengl3.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/general/imgui-1.78/examples/imgui_impl_sdl.cpp
+            )
+ENDIF ()
+
 ADD_EXECUTABLE(${CMAKE_PROJECT_NAME}
-    ${CODEFILES})
+        ${CODEFILES})
 target_include_directories(${CMAKE_PROJECT_NAME}
         PUBLIC ${INCLUDEDIRS})
 
@@ -142,64 +158,63 @@ target_include_directories(${CMAKE_PROJECT_NAME}
 target_include_directories(${CMAKE_PROJECT_NAME}
         PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/general/entt-3.4.0/src/)
 
-IF(CMAKE_SYSTEM_NAME MATCHES "Windows")
-target_include_directories(${CMAKE_PROJECT_NAME}
-        PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/win64/protobuf/include/)
+IF (CMAKE_SYSTEM_NAME MATCHES "Windows")
+    target_include_directories(${CMAKE_PROJECT_NAME}
+            PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/win64/protobuf/include/)
 
-ELSEIF(CMAKE_SYSTEM_NAME MATCHES "Linux")
+ELSEIF (CMAKE_SYSTEM_NAME MATCHES "Linux")
 
-target_include_directories(${CMAKE_PROJECT_NAME}
-        PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/win64/protobuf/include/)
-        
-ELSE()
+    target_include_directories(${CMAKE_PROJECT_NAME}
+            PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/win64/protobuf/include/)
 
-target_include_directories(${CMAKE_PROJECT_NAME}
-        PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/win64/protobuf/include/)
+ELSE ()
 
-ENDIF()
+    target_include_directories(${CMAKE_PROJECT_NAME}
+            PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/win64/protobuf/include/)
+
+ENDIF ()
 
 
-set(SDL 1)
-set(GLFW 0)
-if(SDL)
+if (SDL)
     #add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/general/cdl/source")
-#    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/general/sdl")
-#    set (SDL2_DIR "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/general/sdl")
-#    link_directories(${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/lib)
+    #    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/general/sdl")
+    #    set (SDL2_DIR "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/general/sdl")
+    #    link_directories(${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/lib)
     #PKG_SEARCH_MODULE(SDL2 REQUIRED sdl2)
-#    find_package(SDL2 CONFIG REQUIRED)
-#    target_link_libraries(${target_name} SDL2::SDL2main SDL2::SDL2-static)
-    IF(WIN32 AND MINGW)
+    #    find_package(SDL2 CONFIG REQUIRED)
+    #    target_link_libraries(${target_name} SDL2::SDL2main SDL2::SDL2-static)
+    IF (WIN32 AND MINGW)
         #include(${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/mingw64/sdl/lib/cmake/SDL2/sdl2-config.cmake)
         set(SDL2_PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/mingw64/sdl)
         set(SDL2_LIBDIR "${SDL2_PREFIX}/lib")
-        set(SDL2_LIBRARIES "-L${SDL2_LIBDIR}  -lmingw32 -lSDL2main -lSDL2 -mwindows")
+        #set(SDL2_LIBDIR "C:/Users/caspase/Downloads/SDL2-2.0.12/build")
+        set(SDL2_LIBRARIES "-L${SDL2_LIBDIR}  -lmingw32 -lSDL2main-static -lSDL2-static -lm -luser32 -lgdi32 -lwinmm -limm32 -lole32 -loleaut32 -lversion -luuid -ladvapi32 -lsetupapi -lshell32 -ldinput8 -ldxerr8 -lmingw32 -Wl,--no-undefined -mwindows")
         set(SDL2_INCLUDE_DIRS "${SDL2_PREFIX}/include/SDL2")
         target_include_directories(${CMAKE_PROJECT_NAME}
                 PUBLIC ${SDL2_INCLUDE_DIRS})
         set(LIBS ${LIBS} ${SDL2_LIBRARIES})
 
         #set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS}")
-    ELSEIF(WIN32)
-       # target_include_directories(${CMAKE_PROJECT_NAME}
-       #         PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/mingw64/sdl/include/)
-    ELSEIF(CMAKE_SYSTEM_NAME MATCHES "Linux")
+    ELSEIF (WIN32)
+        # target_include_directories(${CMAKE_PROJECT_NAME}
+        #         PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/mingw64/sdl/include/)
+    ELSEIF (CMAKE_SYSTEM_NAME MATCHES "Linux")
 
         target_include_directories(${CMAKE_PROJECT_NAME}
                 PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/mingw64/sdl/include/)
 
-    ELSE()
+    ELSE ()
         set(SDL2_PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/bsd/sdl)
         set(SDL2_LIBDIR "${SDL2_PREFIX}/lib")
         set(SDL2_LIBRARIES "-L${SDL2_LIBDIR}")
         #set(SDL2_LIBRARIES ${SDL2_LIBRARIES})
         #message (${SDL2_LIBDIR}/libSDL2.a)
         set(SDL2_INCLUDE_DIRS "${SDL2_PREFIX}/include/SDL2")
-        set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -L${SDL2_LIBDIR} -Wl,-search_paths_first  -Wno-unused-command-line-argument -lm -liconv -Wl,-framework,CoreAudio -Wl,-framework,AudioToolbox -Wl,-framework,ForceFeedback -lobjc -Wl,-framework,CoreVideo -Wl,-framework,Cocoa -Wl,-framework,Carbon -Wl,-framework,IOKit -Wl,-weak_framework,QuartzCore -Wl,-weak_framework,Metal")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -L${SDL2_LIBDIR} -Wl,-search_paths_first  -Wno-unused-command-line-argument -lm -liconv -Wl,-framework,CoreAudio -Wl,-framework,AudioToolbox -Wl,-framework,ForceFeedback -lobjc -Wl,-framework,CoreVideo -Wl,-framework,Cocoa -Wl,-framework,Carbon -Wl,-framework,IOKit -Wl,-weak_framework,QuartzCore -Wl,-weak_framework,Metal")
         target_include_directories(${CMAKE_PROJECT_NAME}
                 PUBLIC ${SDL2_INCLUDE_DIRS})
         set(LIBS ${LIBS} ${SDL2_LIBRARIES} libSDL2.a)
-    ENDIF()
+    ENDIF ()
 
 
     message("=======")
@@ -209,7 +224,7 @@ if(SDL)
     message(STATUS "${SDL_STATIC}")
     message(STATUS "${CMAKE_C_FLAGS}")
     message("=======")
-else(GLFW)
+else (GLFW)
     option(USE_MSVC_RUNTIME_LIBRARY_DLL OFF)
     option(BUILD_SHARED_LIBS OFF)
     option(GLFW_BUILD_DOCS OFF)
@@ -219,28 +234,28 @@ else(GLFW)
     include_directories(${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/general/glfw-3.3/include/
             %VULKAN_SDK%/include)
     set(LIBS ${LIBS} glfw)
-endif()
+endif ()
 
-IF(CMAKE_SYSTEM_NAME MATCHES "Windows")
-target_include_directories(${CMAKE_PROJECT_NAME}
-        PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/win64/fmt/include/)
+IF (CMAKE_SYSTEM_NAME MATCHES "Windows")
+    target_include_directories(${CMAKE_PROJECT_NAME}
+            PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/win64/fmt/include/)
 
-ELSEIF(CMAKE_SYSTEM_NAME MATCHES "Linux")
+ELSEIF (CMAKE_SYSTEM_NAME MATCHES "Linux")
 
-target_include_directories(${CMAKE_PROJECT_NAME}
-        PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/win64/fmt/include/)
-        
-ELSE()
-target_include_directories(${CMAKE_PROJECT_NAME}
-        PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/win64/fmt/include/)
-        
-ENDIF()
+    target_include_directories(${CMAKE_PROJECT_NAME}
+            PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/win64/fmt/include/)
+
+ELSE ()
+    target_include_directories(${CMAKE_PROJECT_NAME}
+            PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/win64/fmt/include/)
+
+ENDIF ()
 
 
 link_directories(${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/general/sdl/build)
 
-IF(CMAKE_SYSTEM_NAME MATCHES "Windows") #target_link_libraries(MyExec PUBLIC "-static")
-    IF(USE_GCC)
+IF (CMAKE_SYSTEM_NAME MATCHES "Windows") #target_link_libraries(MyExec PUBLIC "-static")
+    IF (USE_GCC)
         # first create relevant static libraries requried for other projects
 
 
@@ -249,19 +264,19 @@ IF(CMAKE_SYSTEM_NAME MATCHES "Windows") #target_link_libraries(MyExec PUBLIC "-s
         target_link_libraries(${CMAKE_PROJECT_NAME}
 
                 ${LIBS})
-        ELSE()
+    ELSE ()
 
         set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
         set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")
         target_link_libraries(${CMAKE_PROJECT_NAME}
                 ${LIBS})
-    ENDIF()
-ELSEIF(CMAKE_SYSTEM_NAME MATCHES "Linux")
-    set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -g")
+    ENDIF ()
+ELSEIF (CMAKE_SYSTEM_NAME MATCHES "Linux")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
     target_link_libraries(${CMAKE_PROJECT_NAME} pthread
             ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/flatbuffers/linux/lib/libflatbuffers.a)
-ELSE()
-    IF(USE_GCC)
+ELSE ()
+    IF (USE_GCC)
 
         set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
         set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
@@ -269,5 +284,5 @@ ELSE()
                 pthread
                 ${LIBS}
                 )
-    ENDIF()
-ENDIF()
+    ENDIF ()
+ENDIF ()
