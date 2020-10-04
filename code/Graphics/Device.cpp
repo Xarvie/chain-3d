@@ -497,6 +497,7 @@ int Device::createWindow(std::string title, int x, int y, int fullScreen, int lo
     std::cout << SDL_GetError() << std::endl;
     Device::_window->sdlContext = SDL_GL_CreateContext(window);
     Device::_window->_glfwPtr = window;
+    SDL_GL_MakeCurrent(window, Device::_window->sdlContext);
 
     if (!gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress)) {
         std::cout << "Failed to initialize GLAD" << std::endl;
