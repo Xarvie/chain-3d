@@ -44,7 +44,6 @@
 //#endif
 
 #include <cstdint>
-#include <cuchar>
 #include <cassert>
 #include <cmath>
 #include <cstdio>
