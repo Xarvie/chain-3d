@@ -3,7 +3,7 @@ if (POLICY CMP0048)
 endif()
 
 PROJECT(3d)
-cmake_minimum_required (VERSION 3.2)
+cmake_minimum_required (VERSION 3.12)
 list(APPEND CMAKE_MODULE_PATH
   "${CMAKE_SOURCE_DIR}/cmake/macros")
 include(AutoCollect)
@@ -50,23 +50,7 @@ set(LIBS ${LIBS} ${ASSIMP_LIBRARY})
 #link_directories(C:/Users/Xarvie/Desktop/Assimp/lib)
 #link_directories(${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/lib)
 
-set(SDL 0)
-set(GLFW 1)
-if(SDL)
-    include_directories(/usr/local/include/SDL2/)
-    link_directories(/usr/local/lib)
-    set(LIBS ${LIBS} SDL2)
-else(GLFW)
-    option(USE_MSVC_RUNTIME_LIBRARY_DLL OFF)
-    option(BUILD_SHARED_LIBS OFF)
-    option(GLFW_BUILD_DOCS OFF)
-    option(GLFW_BUILD_EXAMPLES OFF)
-    option(GLFW_BUILD_TESTS OFF)
-    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/general/glfw-3.3)
-    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/general/glfw-3.3/include/
-            %VULKAN_SDK%/include)
-    set(LIBS ${LIBS} glfw)
-endif()
+
 
 
 #include_directories(${Vulkan_INCLUDE_DIRS})
@@ -174,6 +158,63 @@ target_include_directories(${CMAKE_PROJECT_NAME}
 
 ENDIF()
 
+
+set(SDL 1)
+set(GLFW 0)
+if(SDL)
+    #add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/general/sdl/source")
+#    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/general/sdl")
+#    set (SDL2_DIR "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/general/sdl")
+#    link_directories(${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/lib)
+    #PKG_SEARCH_MODULE(SDL2 REQUIRED sdl2)
+#    find_package(SDL2 CONFIG REQUIRED)
+#    target_link_libraries(${target_name} SDL2::SDL2main SDL2::SDL2-static)
+    IF(WIN32 AND MINGW)
+        #include(${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/mingw64/sdl/lib/cmake/SDL2/sdl2-config.cmake)
+        set(SDL2_PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/mingw64/sdl)
+        set(SDL2_LIBDIR "${SDL2_PREFIX}/lib")
+        set(SDL2_LIBRARIES "-L${SDL2_LIBDIR}  -lmingw32 -lSDL2main -lSDL2 -mwindows")
+        set(SDL2_INCLUDE_DIRS "${SDL2_PREFIX}/include/SDL2")
+        target_include_directories(${CMAKE_PROJECT_NAME}
+                PUBLIC ${SDL2_INCLUDE_DIRS})
+        set(LIBS ${LIBS} ${SDL2_LIBRARIES})
+
+        #set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS}")
+    ELSEIF(WIN32)
+       # target_include_directories(${CMAKE_PROJECT_NAME}
+       #         PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/mingw64/sdl/include/)
+    ELSEIF(CMAKE_SYSTEM_NAME MATCHES "Linux")
+
+        target_include_directories(${CMAKE_PROJECT_NAME}
+                PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/mingw64/sdl/include/)
+
+    ELSE()
+
+        target_include_directories(${CMAKE_PROJECT_NAME}
+                PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/mingw64/sdl/include/)
+
+    ENDIF()
+
+
+    message("=======")
+    #find_package(SDL2 CONFIG REQUIRED)
+    #target_link_libraries(${target_name} PUBLIC SDL2::SDL2main SDL2::SDL2-static)
+
+    message(STATUS "${SDL_STATIC}")
+    message(STATUS "${CMAKE_C_FLAGS}")
+    message("=======")
+else(GLFW)
+    option(USE_MSVC_RUNTIME_LIBRARY_DLL OFF)
+    option(BUILD_SHARED_LIBS OFF)
+    option(GLFW_BUILD_DOCS OFF)
+    option(GLFW_BUILD_EXAMPLES OFF)
+    option(GLFW_BUILD_TESTS OFF)
+    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/general/glfw-3.3)
+    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/general/glfw-3.3/include/
+            %VULKAN_SDK%/include)
+    set(LIBS ${LIBS} glfw)
+endif()
+
 IF(CMAKE_SYSTEM_NAME MATCHES "Windows")
 target_include_directories(${CMAKE_PROJECT_NAME}
         PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/win64/fmt/include/)
@@ -190,7 +231,7 @@ target_include_directories(${CMAKE_PROJECT_NAME}
 ENDIF()
 
 
-
+link_directories(${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/general/sdl/build)
 
 IF(CMAKE_SYSTEM_NAME MATCHES "Windows") #target_link_libraries(MyExec PUBLIC "-static")
     IF(USE_GCC)
@@ -198,8 +239,9 @@ IF(CMAKE_SYSTEM_NAME MATCHES "Windows") #target_link_libraries(MyExec PUBLIC "-s
 
 
         set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
-        set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O2")
+        set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
         target_link_libraries(${CMAKE_PROJECT_NAME}
+
                 ${LIBS})
         ELSE()
 

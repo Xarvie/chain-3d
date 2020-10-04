@@ -6,7 +6,6 @@
 #define INC_3D_TERRAIN_H
 
 #include <glad/glad.h>
-#include <GLFW/glfw3.h>
 
 #include "Shader.h"
 #include <cmath>

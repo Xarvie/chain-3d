@@ -7,7 +7,6 @@
 #define INC_3D_DEVICE_H
 
 #include <glad/glad.h>
-#include <GLFW/glfw3.h>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -22,10 +21,33 @@
 #include "Model.h"
 #include "Data.h"
 
+#if (USE_SDL2)
+#include "SDL.h"
+typedef SDL_Window DeviceWindow;
+constexpr int KEY_UP = SDL_KEYUP;
+constexpr int KEY_DOWN = SDL_KEYDOWN;
+constexpr int MOUSE_BUTTON_L = SDL_BUTTON_LEFT;
+constexpr int MOUSE_BUTTON_R = SDL_BUTTON_RIGHT;
+constexpr int MOUSE_BUTTON_M = SDL_BUTTON_MIDDLE;
+constexpr int MOUSE_BUTTON_DOWN = SDL_MOUSEBUTTONDOWN;
+constexpr int MOUSE_BUTTON_UP = SDL_MOUSEBUTTONUP;
+#else
+#include <GLFW/glfw3.h>
+    typedef GLFWwindow DeviceWindow;
+    constexpr int KEY_UP = GLFW_RELEASE;
+    constexpr int KEY_DOWN = GLFW_PRESS;
+    constexpr int MOUSE_BUTTON_L = GLFW_MOUSE_BUTTON_LEFT;
+    constexpr int MOUSE_BUTTON_R = GLFW_MOUSE_BUTTON_RIGHT;
+    constexpr int MOUSE_BUTTON_M = GLFW_MOUSE_BUTTON_MIDDLE;
+    constexpr int MOUSE_BUTTON_DOWN = GLFW_PRESS;
+    constexpr int MOUSE_BUTTON_UP = GLFW_RELEASE;
+#endif
+
 class Device {
 public:
     Device();
 
+    typedef SDL_Window DeviceWindow;
     Device(const Device &) = delete;
 
 public:
@@ -103,6 +125,8 @@ public:
         int _bw;
         int _bh;
         void *_glfwPtr;
+        void *content;
+        SDL_GLContext sdlContext;
     };
 
     static Window *_window;
@@ -131,34 +155,37 @@ public:
 
     void getWindowsSize(int &width, int &height, int windowID);
 
-    bool shouldClose();
+    bool running();
 
-    void swapBuffers();
+    static void swapBuffers();
 
     void pollEvents();
 
     void shutDown();
 
-    float getTime();
+    static float getTime();
 
     void VSYNC(bool on);
 
+    static void MSAA();
+
 public:
-    static void framebuffer_size_callback(GLFWwindow *window, int width, int height);
+    static void framebuffer_size_callback(DeviceWindow *window, int width, int height);
 
-    static void mouse_move_callback(GLFWwindow *window, double xpos, double ypos);
+    static void mouse_move_callback(DeviceWindow *window, double xpos, double ypos);
 
-    static void scroll_callback(GLFWwindow *window, double xoffset, double yoffset);
+    static void scroll_callback(DeviceWindow *window, double xoffset, double yoffset);
 
-    static void mouse_button_callback(GLFWwindow *window, int button, int action, int mods);
+    static void mouse_button_callback(DeviceWindow *window, int button, int action, int mods);
 
     static void processInput();
 
     static void error_callback(int error, const char *description);
 
-    static void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods);
+    static void key_callback(DeviceWindow *window, int key, int scancode, int action, int mods);
 
 
+    bool _running = true;
 };
 
 

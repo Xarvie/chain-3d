@@ -22,7 +22,6 @@ int Bomber::initMap()
 {
     Map map;
 
-
     gd.maps.emplace_back(map);
     return 0;
 }
@@ -32,7 +31,7 @@ int Bomber::initUnit()
     for(int i = 0; i < sizeof(sss) / sizeof(sss[0]); i++)
     {
         Unit unit;
-        unit.posObj.pos = (vec3r(Real::FromInt( sss[i][0]), Real::FromInt(sss[i][1]),Real::FromInt(sss[i][2])));
+        unit.posObj.pos = (vec3r(Real( sss[i][0]), Real(sss[i][1]),Real(sss[i][2])));
         unit.modelObj.spiritModelId = sss[i][3];
         gd.maps[0].spiritSet.emplace_back(unit);
         Render* r = Render::get();
@@ -63,28 +62,31 @@ int Bomber::initUnit()
 
 int Bomber::upEvent(bool press)
 {
-    real ang = Real::Div(Real::Pi, Real::FromInt(180));
+    float pai =  3.14;
+    Real toRedian  = Real::PI() / Real(180);
+
+    Real ang =  Real::PI() / Real(180);
     //worldData->unit1->moveObj.move(Real::Mul(ang, Real::FromInt(270)));
     return 0;
 }
 
 int Bomber::downEvent(bool press)
 {
-    real ang = Real::Div(Real::Pi, Real::FromInt(180));
+    Real ang =  Real::PI() / Real(180);
     //worldData->unit1->moveObj.move(Real::Mul(ang, Real::FromInt(90)));
     return 0;
 }
 
 int Bomber::leftEvent(bool press)
 {
-    real ang = Real::Div(Real::Pi, Real::FromInt(180));
+    Real ang =  Real::PI() / Real(180);
     //worldData->unit1->moveObj.move(Real::Mul(ang, Real::FromInt(180)));
     return 0;
 }
 
 int Bomber::rightEvent(bool press)
 {
-    real ang = Real::Div(Real::Pi, Real::FromInt(180));
+    Real ang =  Real::PI() / Real(180);
     //worldData->unit1->moveObj.move(Real::Mul(ang, Real::FromInt(0)));
     return 0;
 }

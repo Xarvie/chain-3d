@@ -17,4 +17,5 @@
 #define SHADER_DIR PROJECT_ROOT_DIR"code/Graphics/shader/"
 #endif
 
+#define USE_SDL2 1
 #endif //DIR_CONFIG_H

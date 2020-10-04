@@ -57,9 +57,9 @@ AABBUtil::AABBUtil(const AABBUtil& box)
 vec3r AABBUtil::getCenter()
 {
     vec3r center;
-    center.x = Real::Half*(Real::Add(aabb._min.x, aabb._max.x));
-    center.y = Real::Half*(Real::Add(aabb._min.y, aabb._max.y));
-    center.z = Real::Half*(Real::Add(aabb._min.z, aabb._max.z));
+    center.x = "0.5"_r*(aabb._min.x + aabb._max.x);
+    center.y = "0.5"_r*((aabb._min.y+ aabb._max.y));
+    center.z = "0.5"_r*((aabb._min.z+aabb._max.z));
 
     return center;
 }
@@ -140,8 +140,8 @@ void AABBUtil::set(const vec3r& min, const vec3r& max)
 //顶点复位 初始化信息
 void AABBUtil::reset()
 {
-    aabb._min = vec3r(Real::FromInt(99999), Real::FromInt(99999), Real::FromInt(99999));
-    aabb._max= vec3r(Real::FromInt(-99999), Real::FromInt(-99999), Real::FromInt(-99999));
+    aabb._min = vec3r(99999_r, 99999_r, 99999_r);
+    aabb._max= vec3r(-99999_r, -99999_r, -99999_r);
 }
 //检测坐标信息是否有误
 bool AABBUtil::isEmpty() const

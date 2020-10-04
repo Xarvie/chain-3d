@@ -14,12 +14,12 @@ public:
     {
 
     }
-    vec3r(real xyz){
+    vec3r(Real xyz){
         this->x = xyz;
         this->y = xyz;
         this->z = xyz;
     }
-    vec3r(real x, real y, real z){
+    vec3r(Real x, Real y, Real z){
         this->x = x;
         this->y = y;
         this->z = z;
@@ -29,7 +29,7 @@ public:
     }
 
     glm::vec3 glm(){
-        return glm::vec3(Real::ToFloat(this->x), Real::ToFloat(this->y), Real::ToFloat(this->z));
+        return glm::vec3((double)(this->x), (double)(this->y), (double)(this->z));
     }
 
 
@@ -39,9 +39,9 @@ public:
 //        this->z = Real::FromFloat(z);
 //    }
 
-    real x;
-    real y;
-    real z;
+    Real x;
+    Real y;
+    Real z;
 };
 
 #endif //INC_3D_VEC3R_H

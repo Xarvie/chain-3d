@@ -9,13 +9,29 @@
 
 std::atomic<char> waiting = 2;
 
-int main() {
 
+
+
+class MYint{
+public:
+     MYint operator+(int a){
+
+        return *this;
+    }
+    int data;
+};
+
+
+
+
+int main(int argc, char **argv){
     std::thread rt1 = std::thread([&] {
+
         worldData = new WorldData();
         auto &d = *worldData->d;
         d.init();
-        d.createWindow("ChainProject", 600, 535, 0, 1);
+
+        d.createWindow("ChainProject", 1366, 1080, 0, 1);
 
         d.VSYNC(worldData->vsync);
 
@@ -34,7 +50,7 @@ int main() {
         ourShader.use();
         waiting--;
 
-        while (d.shouldClose()) {
+        while (d.running()) {
             d.pollEvents();
             worldData->updateTime(d.getTime());
             glDisable(GL_DEPTH_TEST);
@@ -57,7 +73,7 @@ int main() {
         while (waiting);
         game = new Bomber();
         game->init();
-        while (worldData->d->shouldClose()) {
+        while (worldData->d->running()) {
             std::this_thread::sleep_for(std::chrono::seconds(1));
         }
     });

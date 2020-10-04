@@ -266,14 +266,14 @@ int Render::render2dDraw()
     if(!this->maps.empty())
     for(auto E:this->maps[this->curMapIndex].spiritSet){
         Texture2DEx &t = resType[E.modelObj.spiritModelId];
-        drawTexture(Real::ToFloat(E.posObj.pos.x) + t.ModelOffset.x,Real::ToFloat(E.posObj.pos.y) + t.ModelOffset.y
+        drawTexture((double)(E.posObj.pos.x) + t.ModelOffset.x,(double)(E.posObj.pos.y) + t.ModelOffset.y
                 , t.texture, t.texcoords, c, worldData->currentFrame, t.animW, t.animH);
 
     }
     if(!this->maps.empty())
     for(auto E:this->maps[this->curMapIndex].unitSet){
         Texture2DEx &t = resType[E.modelObj.spiritModelId];
-        drawTexture(Real::ToFloat(E.posObj.pos.x) + t.ModelOffset.x,Real::ToFloat(E.posObj.pos.y) + t.ModelOffset.y
+        drawTexture((double)(E.posObj.pos.x) + t.ModelOffset.x,(double)(E.posObj.pos.y) + t.ModelOffset.y
                 , t.texture, t.texcoords, c, worldData->currentFrame, t.animW, t.animH);
 
     }
@@ -377,12 +377,13 @@ int Render::init() {
     glEnable(GL_MULTISAMPLE);
     //glEnable(GL_CULL_FACE);
 
-    glfwWindowHint(GLFW_SAMPLES, worldData->MSAA);
+    Device::MSAA();
+
     glEnable(GL_BLEND);
 
     if (p == nullptr)
         p = new Particle;
-    p->init();
+    p->init();//5M
     worldData->proj = glm::perspective(45.0f,
                                        float(worldData->w) / float(worldData->h),
                                        0.1f, 50.0f);
@@ -510,14 +511,16 @@ int Render::init() {
     }
 #endif
     t = new World;
-    t->renderInit();
+    t->renderInit();//17M
 
 
 #ifdef USE_GUI
 
     g = new gui();
-    g->init((GLFWwindow*)worldData->d->_window->_glfwPtr);
-#endif
+    g->init((DeviceWindow*)worldData->d->_window->_glfwPtr);//20m
+
+    g->gl_context = &Device::_window->sdlContext;
+    #endif
 
 
     this->maps.emplace_back(Map{.index = 0,});

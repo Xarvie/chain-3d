@@ -16,7 +16,7 @@ struct AABBData {
 
 struct MoveComponent
 {
-    real moveSpeed = Real::Div(Real::FromInt(8), Real::FromInt(100));
+    Real moveSpeed = 8_r/100_r;
 
 };
 
