@@ -4,7 +4,7 @@
 
 ## 构建环境  
 ### 开发环境
-目前开发在Windows-msys2-mingw64-GCC/CLang和MacOS环境下，每次封版才会打包Linux-GCC/CLang和VisualStudio依赖库到master分支，所以你需要下载msys2或者xcode
+目前开发在Windows-msys2-mingw64-GCC/CLang和MacOS环境下，每次封版才会打包Linux-GCC/CLang和VisualStudio依赖库到master分支，所以你需要下载msys2或者xcode  
 IDE使用的clion，当然也支持其他支持gcc的IDE，例如：QT，CB，Eclipse，vscode等
 
 ## 编译发布
