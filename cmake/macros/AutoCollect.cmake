@@ -43,23 +43,23 @@ foreach(element ${elements})
   if (NOT ${element_dir} STREQUAL "")
       string(REPLACE "/" "\\" group_name ${element_dir})
       source_group("${group_name}" FILES ${dir}/${element})
-      message("${group_name}" FILES ${dir}/${element})
+#      message("${group_name}" FILES ${dir}/${element})
   else()
     source_group("\\" FILES ${dir}/${element})
-    message("\\" FILES ${dir}/${element})
+#    message("\\" FILES ${dir}/${element})
   endif()
 endforeach()
 endmacro()
 
 macro(configure_files srcDir destDir)
-    message(STATUS "Configuring directory ${destDir}")
+#    message(STATUS "Configuring directory ${destDir}")
     make_directory(${destDir})
 
     file(GLOB templateFiles RELATIVE ${srcDir} ${srcDir}/*)
     foreach(templateFile ${templateFiles})
         set(srcTemplatePath ${srcDir}/${templateFile})
         if(NOT IS_DIRECTORY ${srcTemplatePath})
-            message(STATUS "Configuring file ${templateFile}")
+#            message(STATUS "Configuring file ${templateFile}")
             configure_file(
                     ${srcTemplatePath}
                     ${destDir}/${templateFile}

@@ -880,6 +880,8 @@ static void ShowDemoWindowWidgets()
                 "Read docs/FONTS.md for details.");
             ImGui::Text("Hiragana: \xe3\x81\x8b\xe3\x81\x8d\xe3\x81\x8f\xe3\x81\x91\xe3\x81\x93 (kakikukeko)"); // Normally we would use u8"blah blah" with the proper characters directly in the string.
             ImGui::Text("Kanjis: \xe6\x97\xa5\xe6\x9c\xac\xe8\xaa\x9e (nihongo)");
+            ImGui::Text("chineses simplified: 朝霞白帝彩云间 (chinese mainland)");
+            ImGui::Text("chinese traditional: 朝霞白帝彩雲間 (chinese Hongkong/TaiWan)");
             static char buf[32] = "\xe6\x97\xa5\xe6\x9c\xac\xe8\xaa\x9e";
             //static char buf[32] = u8"NIHONGO"; // <- this is how you would write it with C++11, using real kanjis
             ImGui::InputText("UTF-8 input", buf, IM_ARRAYSIZE(buf));

@@ -262,7 +262,12 @@ static void ImGui_ImplOpenGL3_SetupRenderState(ImDrawData* draw_data, int fb_wid
     };
     glUseProgram(g_ShaderHandle);
     glUniform1i(g_AttribLocationTex, 0);
+#if defined(__EMSCRIPTEN__)
+    glUniform4fv(g_AttribLocationProjMtx, 4, &ortho_projection[0][0]);
+#else
     glUniformMatrix4fv(g_AttribLocationProjMtx, 1, GL_FALSE, &ortho_projection[0][0]);
+#endif
+
 #ifdef GL_SAMPLER_BINDING
     glBindSampler(0, 0); // We use combined texture/sampler state. Applications using GL 3.3 may set that otherwise.
 #endif
@@ -530,21 +535,38 @@ bool    ImGui_ImplOpenGL3_CreateDeviceObjects()
         "    Frag_Color = Color;\n"
         "    gl_Position = ProjMtx * vec4(Position.xy,0,1);\n"
         "}\n";
-
+#if defined(__EMSCRIPTEN__)
     const GLchar* vertex_shader_glsl_300_es =
         "precision mediump float;\n"
         "layout (location = 0) in vec2 Position;\n"
         "layout (location = 1) in vec2 UV;\n"
         "layout (location = 2) in vec4 Color;\n"
-        "uniform mat4 ProjMtx;\n"
+        "uniform vec4 ProjMtx[4];\n"
         "out vec2 Frag_UV;\n"
         "out vec4 Frag_Color;\n"
         "void main()\n"
         "{\n"
         "    Frag_UV = UV;\n"
         "    Frag_Color = Color;\n"
-        "    gl_Position = ProjMtx * vec4(Position.xy,0,1);\n"
+        "    gl_Position = mat4(ProjMtx[0], ProjMtx[1], ProjMtx[2], ProjMtx[3]) * vec4(Position.xy,0,1);\n"
         "}\n";
+#else
+    const GLchar* vertex_shader_glsl_300_es =
+            "precision mediump float;\n"
+            "layout (location = 0) in vec2 Position;\n"
+            "layout (location = 1) in vec2 UV;\n"
+            "layout (location = 2) in vec4 Color;\n"
+            "uniform mat4 ProjMtx;\n"
+            "out vec2 Frag_UV;\n"
+            "out vec4 Frag_Color;\n"
+            "void main()\n"
+            "{\n"
+            "    Frag_UV = UV;\n"
+            "    Frag_Color = Color;\n"
+            "    gl_Position = ProjMtx * vec4(Position.xy,0,1);\n"
+            "}\n";
+#endif
+
 
     const GLchar* vertex_shader_glsl_410_core =
         "layout (location = 0) in vec2 Position;\n"
