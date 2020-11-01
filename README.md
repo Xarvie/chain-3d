@@ -46,7 +46,7 @@ python -m http.server
 运行就是打开Firefox或者Chrome浏览http://localhost:8000/
 
 ### Android
-编译安卓需要Android Studio或者IDEA，Android Studio是基于IDEA开发的，各人推荐使用IDEA，编译所需的Android SDK，使用的是Android 10, 安装IDE的时候会自动下载，但是国内环境很难自动下载下来，特别是在MacOS，翻墙都难下，Windows下比较顺利Linux下未测试。  
+编译安卓需要Android Studio或者IDEA，Android Studio是基于IDEA开发的，个人推荐使用IDEA，编译所需的Android SDK，使用的是Android 10, 安装IDE的时候会自动下载，但是国内环境很难自动下载下来，特别是在MacOS，翻墙都难下，Windows下比较顺利Linux下未测试。  
 下载好了再安装个NDK,后续我没有再搞，手里没有安卓设备，有设备的自己研究下。
 
 ### iOS
