@@ -31,7 +31,19 @@ cmake --build . -j8
 确保#define __EMSCRIPTEN__X  
 修改#define PROJECT_ROOT_DIR "Z:/chain-3d/"为你的项目目录  
 
-平台程序需要自行安装Emscripten，Emscripten官方不支持VS，Windows下只能是用WSL或者MSYS2，官方教程写的WSL安装Linux来跑,但是Msys2也可以跑，而且可以跑的更好。
+生成html需要自行安装Emscripten，Emscripten官方不支持VS，Windows下只能是用WSL或者MSYS2，官方教程写的WSL安装Linux来跑,但是Msys2也可以跑，而且可以跑的更好。  
+安装好了之后，在shel里执行 em++看看环境有没有加上，没有找到程序，就回到官方教程看如何添加环境。  
+配置好环境后执行：
+``` sh
+cd ./chain-3d
+mkdir build
+cd build
+cp ../data.0 ./
+emcmake cmake ..
+make -j 16
+python -m http.server
+```
+运行就是打开Firefox或者Chrome浏览http://localhost:8000/
 
 ### Android
 编译安卓需要Android Studio或者IDEA，Android Studio是基于IDEA开发的，各人推荐使用IDEA，编译所需的Android SDK，使用的是Android 10, 安装IDE的时候会自动下载，但是国内环境很难自动下载下来，特别是在MacOS，翻墙都难下，Windows下比较顺利Linux下未测试。  
