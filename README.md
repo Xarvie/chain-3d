@@ -21,7 +21,7 @@ ide直接点锤子就编译成功了
 cd ./chain-3d
 mkdir build
 cd build
-cmake .. -G "Ninja" #没有Ninja自己安装个，很小很好安装。或者使用cmake .. -G "MinGW Makefiles"
+cmake .. -G "Ninja" #没有Ninja自己安装个，很小很好安装。
 cmake --build . -j8
 ```
 ### web
