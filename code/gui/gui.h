@@ -22,21 +22,19 @@ typedef SDL_Window DeviceWindow2;
 
 #include "OpenglHeader.h"
 #include "imgui.h"
-#if defined(USE_SDL2)
 #if defined(__EMSCRIPTEN__)
-#include "imgui_impl_sdl.h"
 #include <emscripten.h>
-#include "imgui_impl_opengl3.h"
-#else
-#include "imgui_impl_sdl.h"
 #endif
-
+#if defined(USE_SDL2)
+#include "imgui_impl_opengl3.h"
+#include "imgui_impl_sdl.h"
 
 
 
 
 #else
 #include "imgui_impl_glfw.h"
+
 #endif
 #include "imgui_impl_opengl3.h"
 #include <stdio.h>

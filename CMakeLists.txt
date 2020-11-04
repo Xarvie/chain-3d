@@ -138,18 +138,18 @@ ENDIF ()
 IF (IMGUI)
     IF (GLFW)
         include_directories(${CMAKE_PROJECT_NAME}
-                PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/general/imgui/
-                PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/general/imgui/backends/)
+                PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/general/imgui-1.78/
+                PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/general/imgui-1.78/examples/)
         set(CODEFILES ${CODEFILES}
-                ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/general/imgui/backends/imgui_impl_opengl3.cpp
-                ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/general/imgui/backends/imgui_impl_glfw.cpp
+                ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/general/imgui-1.78/examples/imgui_impl_opengl3.cpp
+                ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/general/imgui-1.78/examples/imgui_impl_glfw.cpp
                 )
         set(CODEFILES ${CODEFILES}
-                ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/general/imgui/imgui.cpp
-                ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/general/imgui/imgui_draw.cpp
-                ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/general/imgui/imgui_demo.cpp
-                ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/general/imgui/imgui_widgets.cpp
-                ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/general/imgui/imgui_demo.cpp
+                ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/general/imgui-1.78/imgui.cpp
+                ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/general/imgui-1.78/imgui_draw.cpp
+                ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/general/imgui-1.78/imgui_demo.cpp
+                ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/general/imgui-1.78/imgui_widgets.cpp
+                ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/general/imgui-1.78/imgui_demo.cpp
                 )
     ELSEIF(SDL)
         include_directories(${CMAKE_PROJECT_NAME}
@@ -417,6 +417,6 @@ if (EMSCRIPTEN)
     set(CMAKE_EXECUTABLE_SUFFIX ".html")
     set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -DIMGUI_IMPL_OPENGL_ES3")
     set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES LINK_FLAGS
-            "-s ASYNCIFY=1 -s USE_SDL=2  -s MAX_WEBGL_VERSION=2 -s ALLOW_MEMORY_GROWTH=1 --preload-file data.0 -O3 --closure 1 ")
+            "-s ASYNCIFY=1 -s USE_SDL=2  -s MAX_WEBGL_VERSION=2 -s ALLOW_MEMORY_GROWTH=1 --preload-file data.0 -O3 --closure 1 --shell-file ${CMAKE_CURRENT_SOURCE_DIR}/shell_minimal.html")
     # -s ERROR_ON_UNDEFINED_SYMBOLS=0  -s USE_GLFW=3 -s USE_SDL=2 -s FULL_ES3=1 -s FULL_ES2=1 -s USE_WEBGL2=1  --preload-file data.0 --shell-file shell_minimal.html -s MIN_WEBGL_VERSION=2 -s MAX_WEBGL_VERSION=2
 endif()

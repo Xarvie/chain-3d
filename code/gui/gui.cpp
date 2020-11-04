@@ -5,7 +5,7 @@
 #include "gui.h"
 #include "Device.h"
 #include "ResourceMgr.h"
-
+#include <emscripten.h>
 
 static void glfw_error_callback(int error, const char* description)
 {
@@ -25,6 +25,25 @@ int gui::clean()
     return 0;
 }
 
+void setIMEPos(int x, int y){
+    EM_ASM_(
+            {
+            var x = String($0)+"px";
+            var y = String($1)+"px";
+            document.getElementById('my_textbox1').focus();
+            document.getElementById("my_textbox1").style.left=x;
+            document.getElementById("my_textbox1").style.top=y;
+            },
+            x,y
+    );
+}
+
+int cb(ImGuiInputTextCallbackData* data){
+    if(data->CursorPos)
+        setIMEPos(0,0);
+    return 0;
+}
+
 int gui::render(){
     ImGui_ImplOpenGL3_NewFrame();
 #if defined(USE_SDL2)
@@ -41,8 +60,37 @@ int gui::render(){
     window_flags |= ImGuiWindowFlags_NoTitleBar;
 
     io->FontGlobalScale = this->dpi;
+
+    static std::string str2 = "";
+    const char* str = emscripten_run_script_string("document.getElementById('my_textbox2').value");
+    if(strlen(str)>0)
+    {
+        EM_ASM(
+                document.getElementById('my_textbox2').value = "";
+
+        );
+        str2+=std::string(str);
+    }
+
+
+
     ImGui::Begin("FPS", nullptr, window_flags);
-    ImGui::Text("DPI:%.2f, %.2f ms/frame %.0f FPS",io->FontGlobalScale,  1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+
+    if (ImGui::Button("clickme"))
+    {
+        setIMEPos(0,0);
+    }
+
+    static char text[1024 * 16] =
+            "/*\n"
+            " The Pentium F00F bug, shorthand for F0 0F C7 C8,\n"
+            " the hexadecimal encoding of one offending instruction,\n";
+    str2.c_str();
+    strcpy(text,  str2.c_str());
+//    ImGuiInputTextFlags_CallbackResize
+    //ImGui::InputTextMultiline("##source", text, IM_ARRAYSIZE(text), ImVec2(-FLT_MIN, ImGui::GetTextLineHeight() * 16), ImGuiInputTextFlags_AllowTabInput, 0);
+    ImGui::Text("%s", str2.c_str());
+//    ImGui::Text("DPI:%.2f, %.2f ms/frame %.0f FPS",io->FontGlobalScale,  1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
     ImGui::End();
 
 #if 0
@@ -160,7 +208,11 @@ int gui::init(DeviceWindow* window)
     #endif
 #else
     ImGui_ImplGlfw_InitForOpenGL(window, true);
-    const char* glsl_version = "#version 150";
+    #if defined(IOS) or defined(__EMSCRIPTEN__)
+        const char* glsl_version = "#version 300 es";
+    #else
+        const char* glsl_version = "#version 150";
+    #endif
 #endif
     ImGui_ImplOpenGL3_Init(glsl_version);
 
@@ -230,6 +282,12 @@ static auto resData2 = res.Res("mini.ttf");
 
 #endif
     io->FontGlobalScale = this->dpi;
+
+//    EM_ASM(
+//            document.getElementById('my_textbox2').value = 'Hello, emscripten world!';
+//
+//    );
+
     return 0;
 }
 

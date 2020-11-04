@@ -11,7 +11,7 @@
 #define RES_DIR PROJECT_ROOT_DIR"resources/"
 #define SHADER_DIR RES_DIR"Shader/"
 #elif __WIN32
-#define PROJECT_ROOT_DIR "Z:/em/"
+#define PROJECT_ROOT_DIR "Z:/chain-3d"
 //#define PROJECT_ROOT_DIR "../"
 #define RES_DIR PROJECT_ROOT_DIR"resources/"
 #define SHADER_DIR PROJECT_ROOT_DIR"code/Graphics/shader/"

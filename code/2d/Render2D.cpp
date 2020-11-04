@@ -320,6 +320,7 @@ void Render2D::drawTexture(float x, float y, TextureEx1 *texture, glm::vec2 *tex
 }
 
 int Render2D::render2dDraw() {
+
     auto &shader2D = shader[SHADER_TYPE::LOGIC_2D];
     glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);

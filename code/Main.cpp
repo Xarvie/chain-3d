@@ -244,6 +244,7 @@ std::cout << __cplusplus << std::endl;
 
     r2d.render2DInit();
 
+
     gui::get()->init(d._window->rawPtr);
 
      r.VSYNC(true);
@@ -264,14 +265,16 @@ void main_loop(void* arg){
     auto& d = *Device::get();
     auto& r = *RenderBase::get();
     auto& g = *gui::get();
+
     d.pollEvents();
-    const int FPS=1000/60;
-    static int _FPS_Timer = 0;
-    if(d.getTime()*1000-_FPS_Timer<FPS){
-        SDL_Delay(FPS-d.getTime()*1000+_FPS_Timer);
-    }
-    _FPS_Timer=SDL_GetTicks();
+//    const int FPS=1000/60;
+//    static int _FPS_Timer = 0;
+//    if(d.getTime()*1000-_FPS_Timer<FPS){
+//        SDL_Delay(FPS-d.getTime()*1000+_FPS_Timer);
+//    }
+//    _FPS_Timer=SDL_GetTicks();
     r.updateTime(d.getTime());
+
 
     r2d.render2dDraw();
     g.render();

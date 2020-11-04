@@ -295,7 +295,7 @@ int Device::createWindow(std::string title, int x, int y, int fullScreen, int lo
     glfwSetScrollCallback(window, scroll_callback);
     glfwSetMouseButtonCallback(window, mouse_button_callback);
 
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+//    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 #if !defined(__EMSCRIPTEN__)
     if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {
@@ -329,55 +329,55 @@ void Device::error_callback(int error, const char *description) {
 
 
 void Device::key_callback(DeviceWindow *window, int key, int scancode, int action, int mods) {
-    if (action != GLFW_PRESS)
-        return;
-    switch (key) {
-        case GLFW_KEY_ESCAPE:
-            break;
-        case GLFW_KEY_V:
-        {
-            static int LineMode = GL_FILL;
-            if (LineMode == GL_FILL) {
-                LineMode = GL_LINE;
-            } else {
-                LineMode = GL_FILL;
-            }
-            //glPolygonMode(GL_FRONT_AND_BACK, LineMode);
-            break;
-        }
-        case GLFW_KEY_F1:
-        {
-
-            GUIMode = !GUIMode;
-            if (GUIMode) {
-                glfwGetCursorPos(window, &mouseX, &mouseY);
-                //glfwSetCursorPos(window, 1, 1);
-                glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-
-            } else {
-                glfwSetCursorPos(window, mouseX, mouseY);
-                glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-            }
-            break;
-        }
-        case GLFW_KEY_F2:
-        {
-//            worldData->shadowOn = !worldData->shadowOn;
-            break;
-        }
-        case GLFW_KEY_F3:
-        {
-//            worldData->particleOn = !worldData->particleOn;
-            break;
-        }
-        case GLFW_KEY_F4:
-        {
-//            worldData->bloomOn = !worldData->bloomOn;
-            break;
-        }
-        default:
-            break;
-    }
+//    if (action != GLFW_PRESS)
+//        return;
+//    switch (key) {
+//        case GLFW_KEY_ESCAPE:
+//            break;
+//        case GLFW_KEY_V:
+//        {
+//            static int LineMode = GL_FILL;
+//            if (LineMode == GL_FILL) {
+//                LineMode = GL_LINE;
+//            } else {
+//                LineMode = GL_FILL;
+//            }
+//            //glPolygonMode(GL_FRONT_AND_BACK, LineMode);
+//            break;
+//        }
+//        case GLFW_KEY_F1:
+//        {
+//
+//            GUIMode = !GUIMode;
+//            if (GUIMode) {
+//                glfwGetCursorPos(window, &mouseX, &mouseY);
+//                //glfwSetCursorPos(window, 1, 1);
+//                glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+//
+//            } else {
+//                glfwSetCursorPos(window, mouseX, mouseY);
+//                glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+//            }
+//            break;
+//        }
+//        case GLFW_KEY_F2:
+//        {
+////            worldData->shadowOn = !worldData->shadowOn;
+//            break;
+//        }
+//        case GLFW_KEY_F3:
+//        {
+////            worldData->particleOn = !worldData->particleOn;
+//            break;
+//        }
+//        case GLFW_KEY_F4:
+//        {
+////            worldData->bloomOn = !worldData->bloomOn;
+//            break;
+//        }
+//        default:
+//            break;
+//    }
 }
 
 void Device::processInput() {
@@ -409,8 +409,8 @@ void Device::processInput() {
 }
 
 void Device::mouse_move_callback(DeviceWindow *window, double xpos, double ypos) {
-    if(GUIMode)
-        return ;
+//    if(GUIMode)
+//        return ;
 //    if (worldData->firstMouse) {
 //        worldData->lastX = xpos;
 //        worldData->lastY = ypos;
@@ -428,8 +428,8 @@ void Device::framebuffer_size_callback(DeviceWindow *window, int width, int heig
 }
 
 void Device::scroll_callback(DeviceWindow *window, double xoffset, double yoffset) {
-    if(GUIMode)
-        return ;
+//    if(GUIMode)
+//        return ;
 //    worldData->camera.ProcessMouseScroll(yoffset);
 }
 
@@ -697,13 +697,13 @@ void Device::swapBuffers() {
 bool Device::running() {
     return _running;
 }
-
+#include "gui.h"
 void Device::pollEvents() {
     static SDL_Event e;
 
     while (SDL_PollEvent(&e)) {
 #ifdef USE_GUI
-        //ImGui_ImplSDL2_ProcessEvent(&e);
+        ImGui_ImplSDL2_ProcessEvent(&e);
 #endif
         switch (e.type) {
             case SDL_FINGERMOTION:
